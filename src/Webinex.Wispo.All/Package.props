@@ -1,0 +1,17 @@
+﻿<Project>
+    <PropertyGroup>
+        <Title>Webinex Wispo</Title>
+        <PackageVersion>0.0.2</PackageVersion>
+        <Authors>Webinex Dev</Authors>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <LangVersion>8.0</LangVersion>
+        <Nullable>disable</Nullable>
+        <Description>Easy to use in-system notifications</Description>
+        <Copyright>Webinex Dev</Copyright>
+        <PackageProjectUrl>https://github.com/webinex/starter-kit</PackageProjectUrl>
+        <License>https://github.com/webinex/starter-kit/LICENSE</License>
+        <RepositoryUrl>https://github.com/webinex/starter-kit</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+</Project>

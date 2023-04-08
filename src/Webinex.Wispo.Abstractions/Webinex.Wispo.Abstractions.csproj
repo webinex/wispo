@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(MSBuildThisFileDirectory)/../Webinex.Wispo.All/Package.props"/>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <PackageId>Webinex.Wispo.Abstractions</PackageId>
+    <RootNamespace>Webinex.Wispo</RootNamespace>
+  </PropertyGroup>
+
+</Project>

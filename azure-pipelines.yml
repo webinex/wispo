@@ -1,0 +1,88 @@
+name: Webinex / Wispo / CI
+
+pr:
+  - master
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: "ubuntu-latest"
+
+steps:
+  - task: UseDotNet@2
+    displayName: "[BE]: .NET SDK"
+    inputs:
+      workingDirectory: src
+      useGlobalJson: true
+
+  - task: DotNetCoreCLI@2
+    displayName: "[BE]: Restore packages"
+    inputs:
+      command: "restore"
+      projects: "src/Webinex.Wispo.sln"
+      verbosityRestore: normal
+
+  - task: DotNetCoreCLI@2
+    displayName: "[BE]: Build"
+    inputs:
+      command: "build"
+      arguments: "--no-restore"
+      projects: "src/Webinex.Wispo.sln"
+
+  - task: DotNetCoreCLI@2
+    displayName: "[BE]: Test"
+    inputs:
+      command: "test"
+      projects: "**/*.csproj"
+      arguments: "--no-build"
+
+  - task: NodeTool@0
+    displayName: "[FE]: NodeJS"
+    inputs:
+      versionSpec: "18.13.x"
+
+  - script: yarn install --frozen-lockfile
+    displayName: "[FE]: Install packages"
+    workingDirectory: "src/Webinex.Wispo.NpmPackage"
+
+  - script: yarn lint
+    displayName: "[FE]: Lint"
+    workingDirectory: "src/Webinex.Wispo.NpmPackage"
+
+  - script: yarn build
+    displayName: "[FE]: Build"
+    workingDirectory: "src/Webinex.Wispo.NpmPackage"
+
+  - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+      - task: PowerShell@2
+        displayName: "[BE]: Build & Publish"
+        inputs:
+          filePath: scripts/Publish-NugetPackages.ps1
+          arguments: "-ApiKey $(NUGET_API_KEY)"
+          errorActionPreference: stop
+          failOnStderr: false
+
+  - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+      - task: PowerShell@2
+        displayName: "[FE]: Build & Publish"
+        inputs:
+          filePath: scripts/Publish-NpmPackages.ps1
+          arguments: "-AuthToken $(NPM_AUTH_TOKEN) -KeepNpmRc $true"
+          errorActionPreference: stop
+          failOnStderr: false
+
+  - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+      - script: |
+          git config --global user.name "${GH_NAME}"
+          git config --global user.email "${GH_EMAIL}"
+          echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}" > ~/.netrc
+          yarn install
+          GIT_USER="${GH_NAME}" yarn deploy
+        displayName: "[DOCS]: Build & Publish"
+        env:
+          GH_NAME: "webinex"
+          GH_EMAIL: "webinex.dev@gmail.com"
+          GH_TOKEN: $(GITHUB_PAT)
+        workingDirectory: "docs"

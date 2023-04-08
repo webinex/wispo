@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webinex.Wispo", "Webinex.Wispo\Webinex.Wispo.csproj", "{C5A8CD17-8833-4478-9C58-A83CC946C8F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webinex.Wispo.Abstractions", "Webinex.Wispo.Abstractions\Webinex.Wispo.Abstractions.csproj", "{66D1ACA0-46A0-4AD9-9DCF-47AFFADFBD0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webinex.Wispo.All", "Webinex.Wispo.All\Webinex.Wispo.All.csproj", "{B17F3037-41C4-4991-AC25-01C9847B452E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webinex.Wispo.AspNetCore", "Webinex.Wispo.AspNetCore\Webinex.Wispo.AspNetCore.csproj", "{B924F544-FD38-4D24-8846-1FE364A511CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webinex.Wispo.SignalR", "Webinex.Wispo.SignalR\Webinex.Wispo.SignalR.csproj", "{07F594D1-91D4-4CD8-9DBB-C546F3A0D573}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webinex.Wispo.Tests", "Webinex.Wispo.Tests\Webinex.Wispo.Tests.csproj", "{5C75EF51-DAFB-48F2-98C9-30BE6C978FB5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5A8CD17-8833-4478-9C58-A83CC946C8F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5A8CD17-8833-4478-9C58-A83CC946C8F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5A8CD17-8833-4478-9C58-A83CC946C8F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5A8CD17-8833-4478-9C58-A83CC946C8F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66D1ACA0-46A0-4AD9-9DCF-47AFFADFBD0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66D1ACA0-46A0-4AD9-9DCF-47AFFADFBD0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66D1ACA0-46A0-4AD9-9DCF-47AFFADFBD0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66D1ACA0-46A0-4AD9-9DCF-47AFFADFBD0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B17F3037-41C4-4991-AC25-01C9847B452E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B17F3037-41C4-4991-AC25-01C9847B452E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B17F3037-41C4-4991-AC25-01C9847B452E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B17F3037-41C4-4991-AC25-01C9847B452E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B924F544-FD38-4D24-8846-1FE364A511CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B924F544-FD38-4D24-8846-1FE364A511CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B924F544-FD38-4D24-8846-1FE364A511CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B924F544-FD38-4D24-8846-1FE364A511CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07F594D1-91D4-4CD8-9DBB-C546F3A0D573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F594D1-91D4-4CD8-9DBB-C546F3A0D573}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07F594D1-91D4-4CD8-9DBB-C546F3A0D573}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07F594D1-91D4-4CD8-9DBB-C546F3A0D573}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C75EF51-DAFB-48F2-98C9-30BE6C978FB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C75EF51-DAFB-48F2-98C9-30BE6C978FB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C75EF51-DAFB-48F2-98C9-30BE6C978FB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C75EF51-DAFB-48F2-98C9-30BE6C978FB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(MSBuildThisFileDirectory)/Package.props"/>
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>Webinex.Wispo.All</PackageId>
+    <RootNamespace>Webinex.Wispo.All</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Webinex.Wispo.Abstractions\Webinex.Wispo.Abstractions.csproj"/>
+    <ProjectReference Include="..\Webinex.Wispo.AspNetCore\Webinex.Wispo.AspNetCore.csproj"/>
+    <ProjectReference Include="..\Webinex.Wispo\Webinex.Wispo.csproj"/>
+    <ProjectReference Include="..\Webinex.Wispo.SignalR\Webinex.Wispo.SignalR.csproj"/>
+  </ItemGroup>
+
+</Project>
