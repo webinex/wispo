@@ -2,7 +2,7 @@
   "name": "@webinex/wispo",
   "description": "Webinex Wispo",
   "private": false,
-  "version": "1.0.1",
+  "version": "2.0.0-build4",
   "author": "Webinex Dev",
   "license": "Apache-2.0",
   "main": "dist/cjs/index.js",
@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "build": "rimraf dist && rollup -c --environment ENV:production --failAfterWarnings",
+    "build:dev": "rimraf dist && rollup -c --environment ENV:development --failAfterWarnings",
     "start": "rollup -c -w",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "prettier:write": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
@@ -29,6 +30,7 @@
     "@rollup/plugin-typescript": "^11.1.0",
     "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
+    "@webinex/asky": "^1.1.0",
     "axios": "^1.3.5",
     "eslint": "^8.38.0",
     "eslint-config-react-app": "^7.0.1",
@@ -47,6 +49,7 @@
   },
   "peerDependencies": {
     "@microsoft/signalr": ">=5",
+    "@webinex/asky": ">=1",
     "axios": ">=0.24",
     "react": ">=16",
     "react-dom": ">=16"

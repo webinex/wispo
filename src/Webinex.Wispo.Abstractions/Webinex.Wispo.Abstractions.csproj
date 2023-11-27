@@ -5,6 +5,12 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>Webinex.Wispo.Abstractions</PackageId>
     <RootNamespace>Webinex.Wispo</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Webinex.Asky" Version="1.2.1" />
+  </ItemGroup>
 
 </Project>

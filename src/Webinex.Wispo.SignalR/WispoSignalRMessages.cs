@@ -1,8 +1,7 @@
-﻿namespace Webinex.Wispo.SignalR
+﻿namespace Webinex.Wispo.SignalR;
+
+public static class WispoSignalRMessages
 {
-    public static class WispoSignalRMessages
-    {
-        public static readonly string New = "wispo://NEW";
-        public static readonly string Read = "wispo://READ";
-    }
+    public static readonly string NEW = "wispo://NEW";
+    public static readonly string READ = "wispo://READ";
 }

@@ -1,12 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace Webinex.Wispo.DataAccess
-{
-    public interface IWispoDbContext
-    {
-        DbSet<NotificationRow> Notifications { get; }
+namespace Webinex.Wispo.DataAccess;
 
-        Task SaveChangesAsync();
-    }
+public interface IWispoDbContext<TData>
+{
+    DbSet<NotificationRow<TData>> Notifications { get; }
+    Task SaveChangesAsync();
 }
