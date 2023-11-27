@@ -1,18 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="$(MSBuildThisFileDirectory)/../Webinex.Wispo.All/Package.props" />
+  <Import Project="$(MSBuildThisFileDirectory)/../Webinex.Wispo.All/Package.props"/>
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <PackageId>Webinex.Wispo.AspNetCore</PackageId>
     <RootNamespace>Webinex.Wispo.AspNetCore</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Webinex.Wispo\Webinex.Wispo.csproj" />
+    <ProjectReference Include="..\Webinex.Wispo\Webinex.Wispo.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
 
 </Project>

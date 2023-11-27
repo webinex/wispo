@@ -1398,6 +1398,11 @@
     "@typescript-eslint/types" "5.57.1"
     eslint-visitor-keys "^3.3.0"
 
+"@webinex/asky@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@webinex/asky/-/asky-1.1.0.tgz#d2f84f98806ed2e143242e78a921ae7ac56a5626"
+  integrity sha512-8HfwJY0h6LgvX4/O7/muiZHgIq/9y3LmoUZ9rHzb1ALHc9Fb2Nxhp4MJo4PCsQma9yftigCsYje+/okZlhd+xw==
+
 abort-controller@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/abort-controller/-/abort-controller-3.0.0.tgz#eaf54d53b62bae4138e809ca225c8439a6efb392"

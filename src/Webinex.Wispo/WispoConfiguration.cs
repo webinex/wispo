@@ -1,72 +1,96 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Webinex.Asky;
 using Webinex.Wispo.DataAccess;
-using Webinex.Wispo.Filters;
-using Webinex.Wispo.Ports;
 using Webinex.Wispo.Services;
-using Webinex.Wispo.Services.Templates;
 
-namespace Webinex.Wispo
+namespace Webinex.Wispo;
+
+/// <summary>
+///     Wispo configuration
+/// </summary>
+public interface IWispoConfiguration
 {
     /// <summary>
-    ///     Wispo configuration
+    ///     Service collection. Can be used in child packages.
     /// </summary>
-    public interface IWispoConfiguration
-    {
-        /// <summary>
-        ///     Service collection. Can be used in child packages.
-        /// </summary>
-        [NotNull]
-        IServiceCollection Services { get; }
-        
-        /// <summary>
-        ///     Values. Can be used in child packages.
-        /// </summary>
-        [NotNull]
-        IDictionary<string, object> Values { get; }
+    IServiceCollection Services { get; }
 
-        /// <summary>
-        ///     Adds notification DAO services based on <typeparamref name="TDbContext"/> ef core context.
-        /// </summary>
-        /// <typeparam name="TDbContext">Type of DbContext to use</typeparam>
-        /// <returns><see cref="IWispoConfiguration"/></returns>
-        IWispoConfiguration AddDbContext<TDbContext>()
-            where TDbContext : class, IWispoDbContext;
+    /// <summary>
+    ///     Data type
+    /// </summary>
+    Type DataType { get; }
+
+    /// <summary>
+    ///     Values. Can be used in child packages.
+    /// </summary>
+    IDictionary<string, object> Values { get; }
+
+    /// <summary>
+    ///     Adds notification DAO services based on <typeparamref name="TDbContext"/> ef core context.
+    /// </summary>
+    /// <typeparam name="TDbContext">Type of DbContext to use</typeparam>
+    /// <returns><see cref="IWispoConfiguration"/></returns>
+    IWispoConfiguration AddDbContext<TDbContext>()
+        where TDbContext : class;
+}
+
+internal class WispoConfiguration : IWispoConfiguration
+{
+    private WispoConfiguration(IServiceCollection services, Type dataType)
+    {
+        Services = services;
+        DataType = dataType;
+
+        services.TryAddScoped(
+            typeof(IWispo<>).MakeGenericType(DataType),
+            typeof(WispoService<>).MakeGenericType(DataType));
+        services.TryAddScoped(
+            typeof(IQueryService<>).MakeGenericType(DataType),
+            typeof(QueryService<>).MakeGenericType(DataType));
+        services.TryAddScoped(
+            typeof(IReadService),
+            typeof(ReadService<>).MakeGenericType(DataType));
+        services.TryAddScoped(
+            typeof(IAskyFieldMap<>).MakeGenericType(typeof(NotificationRow<>).MakeGenericType(DataType)),
+            typeof(NotificationRowAskyFieldMap<>).MakeGenericType(DataType));
     }
-    
-    internal class WispoConfiguration : IWispoConfiguration
+
+    public IServiceCollection Services { get; }
+    public Type DataType { get; }
+    public IDictionary<string, object> Values { get; } = new Dictionary<string, object>();
+
+    public IWispoConfiguration AddDbContext<TDbContext>() where TDbContext : class
     {
-        public WispoConfiguration(IServiceCollection services)
-        {
-            Services = services;
+        var serviceType = typeof(IWispoDbContext<>).MakeGenericType(DataType);
+        if (!serviceType.IsAssignableFrom(typeof(TDbContext)))
+            throw new InvalidOperationException($"{nameof(TDbContext)} might be assignable to {serviceType.FullName}");
 
-            services.TryAddScoped<IWispo, WispoFacade>();
-            services.TryAddScoped<IValuesService, ValuesService>();
-            services.TryAddScoped<ISendService, SendService>();
-            services.TryAddScoped<IGetService, GetService>();
-            services.TryAddScoped<IMarkReadService, MarkReadService>();
-            services.TryAddScoped<IValidationService, ValidationService>();
-            services.TryAddScoped<IWispoMapper, DefaultWispoMapper>();
-            services.TryAddScoped<ITemplateService, DefaultTemplateService>();
-            services.TryAddScoped<IFilterFactory, FilterFactory>();
-            services.TryAddScoped<IFieldMap, DefaultFieldMap>();
-            services.TryAddScoped<ISortService, SortService>();
-        }
+        Services.TryAddScoped(serviceType, typeof(TDbContext));
+        return this;
+    }
 
-        public IServiceCollection Services { get; }
-        public IDictionary<string, object> Values { get; } = new Dictionary<string, object>();
+    public void Complete()
+    {
+        Services.TryAddSingleton(
+            typeof(IAskyFieldMap<>).MakeGenericType(DataType),
+            typeof(EmptyAskyFieldMap<>).MakeGenericType(DataType));
+    }
 
-        public IWispoConfiguration AddDbContext<TDbContext>() where TDbContext : class, IWispoDbContext
-        {
-            Services.TryAddScoped<IWispoDbContext, TDbContext>();
-            return this;
-        }
+    internal static WispoConfiguration GetOrCreate(IServiceCollection services, Type dataType)
+    {
+        var instance = (WispoConfiguration?)services.FirstOrDefault(x =>
+                x.ImplementationInstance?.GetType() == typeof(WispoConfiguration))
+            ?.ImplementationInstance;
 
-        public void Complete()
-        {
-            Services.TryAddSingleton<IWispoAccountAccessPort, DefaultWispoAccountAccessAdapter>();
-        }
+        if (instance != null)
+            return instance;
+
+        instance = new WispoConfiguration(services, dataType);
+        services.AddSingleton(instance);
+        return instance;
     }
 }

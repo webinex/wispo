@@ -1,7 +1,7 @@
 ﻿<Project>
     <PropertyGroup>
         <Title>Webinex Wispo</Title>
-        <PackageVersion>0.0.2</PackageVersion>
+        <PackageVersion>2.0.0-build4</PackageVersion>
         <Authors>Webinex Dev</Authors>
         <NoWarn>$(NoWarn);CS1591</NoWarn>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

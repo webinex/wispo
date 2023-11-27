@@ -11,16 +11,6 @@ export function reduceBy<TItem, TKey extends keyof any, TValue = TItem>(
   }, {} as Record<TKey, TValue>);
 }
 
-export function except<T>(items: T[], exceptItems: T[]) {
-  return items.filter((item) => exceptItems.indexOf(item) < 0);
-}
-
-export function unique<T>(...arrays: T[][]): T[] {
-  const values = arrays.reduce((result, array) => result.concat(array ?? []), [] as T[]);
-
-  return Array.from(new Set(values));
-}
-
 export function shallowEqual<T>(x: T, y: T) {
   if (Object.is(x, y)) {
     return true;

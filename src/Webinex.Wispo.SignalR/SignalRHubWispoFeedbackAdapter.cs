@@ -3,51 +3,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Webinex.Wispo.AspNetCore;
 using Webinex.Wispo.Ports;
-using Webinex.Wispo.Services;
 
-namespace Webinex.Wispo.SignalR
+namespace Webinex.Wispo.SignalR;
+
+internal class SignalRHubWispoFeedbackAdapter<TData, THub> : IWispoFeedbackPort<TData>
+    where THub : Hub
 {
-    internal class SignalRHubWispoFeedbackAdapter<THub> : IWispoFeedbackPort
-        where THub : Hub
+    private readonly IHubContext<THub> _hubContext;
+    private readonly IWispoAspNetCoreMapper<TData> _mapper;
+
+    public SignalRHubWispoFeedbackAdapter(IHubContext<THub> hubContext, IWispoAspNetCoreMapper<TData> mapper)
     {
-        private readonly IHubContext<THub> _hubContext;
-        private readonly IWispoMapper _mapper;
+        _hubContext = hubContext;
+        _mapper = mapper;
+    }
 
-        public SignalRHubWispoFeedbackAdapter(IHubContext<THub> hubContext, IWispoMapper mapper)
+    public async Task SendNewAsync(IEnumerable<Notification<TData>> notifications)
+    {
+        notifications = notifications?.ToArray() ?? throw new ArgumentNullException(nameof(notifications));
+        var mapped = await _mapper.MapAsync(notifications.ToArray());
+        
+        foreach (var group in notifications.GroupBy(x => x.RecipientId).ToArray())
         {
-            _hubContext = hubContext;
-            _mapper = mapper;
+            await _hubContext.Clients
+                .Group(group.Key)
+                .SendAsync(
+                    WispoSignalRMessages.NEW,
+                    group.Select(x => mapped.Single(m => m.Id == x.Id)));
         }
+    }
 
-        public async Task SendNewAsync(IEnumerable<NewNotificationFeedbackArgs> args)
+    public async Task SendReadAsync(IEnumerable<Notification<TData>> notifications)
+    {
+        notifications = notifications?.ToArray() ?? throw new ArgumentNullException(nameof(notifications));
+
+        foreach (var group in notifications.GroupBy(x => x.RecipientId).ToArray())
         {
-            args = args?.ToArray() ?? throw new ArgumentNullException(nameof(args));
-            var recipients = args.SelectMany((arg) => arg.AccessibleBy).Distinct().ToArray();
-
-            foreach (var recipient in recipients)
-            {
-                var feedbackArgsForRecipient = args.Where(x => x.AccessibleBy.Contains(recipient)).ToArray();
-                var notificationIds = feedbackArgsForRecipient.Select(x => x.Notification.Id).ToArray();
-                var mappedNotifications = _mapper.MapMany(feedbackArgsForRecipient.Select(x => x.Notification).ToArray());
-                await _hubContext.Clients.User(recipient).SendAsync(WispoSignalRMessages.New, notificationIds.Length,
-                    notificationIds, mappedNotifications);
-            }
-        }
-
-        public async Task SendReadAsync(IEnumerable<ReadNotificationFeedbackArgs> args)
-        {
-            args = args?.ToArray() ?? throw new ArgumentNullException(nameof(args));
-
-            var recipients = args.SelectMany(x => x.AccessibleBy).Distinct().ToArray();
-            foreach (var recipient in recipients)
-            {
-                var notifications = args.Where(x => x.AccessibleBy.Contains(recipient)).ToArray();
-                var notificationIds = notifications.Select(x => x.Notification.Id).ToArray();
-
-                await _hubContext.Clients.User(recipient)
-                    .SendAsync(WispoSignalRMessages.Read, notificationIds.Length, notificationIds);
-            }
+            await _hubContext.Clients
+                .Group(group.Key)
+                .SendAsync(
+                    WispoSignalRMessages.READ,
+                    group.Select(x => x.Id));
         }
     }
 }

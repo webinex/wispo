@@ -1,61 +1,50 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Webinex.Wispo.DataAccess
+namespace Webinex.Wispo.DataAccess;
+
+public class NotificationRow<TData>
 {
-    /// <summary>
-    ///     Wispo notification entity
-    /// </summary>
-    public class NotificationRow
+    public Guid Id { get; protected set; }
+    public string RecipientId { get; protected set; } = null!;
+    public string Type { get; protected set; } = null!;
+    public TData Data { get; protected set; } = default!;
+    public bool IsRead { get; protected set; }
+    public DateTimeOffset CreatedAt { get; protected set; }
+    public string? ReadById { get; protected set; } = null!;
+    public DateTimeOffset? ReadAt { get; protected set; }
+
+    protected NotificationRow()
     {
-        /// <summary>
-        ///     Notification identifier
-        /// </summary>
-        public Guid Id { get; set; }
-        
-        /// <summary>
-        ///     Notification recipient
-        /// </summary>
-        public string RecipientId { get; set; }
-        
-        /// <summary>
-        ///     Notification subject
-        /// </summary>
-        public string Subject { get; set; }
-        
-        /// <summary>
-        ///     Notification body
-        /// </summary>
-        public string Body { get; set; }
-        
-        /// <summary>
-        ///     True when notification read
-        /// </summary>
-        public bool IsRead { get; set; }
-        
-        /// <summary>
-        ///     Date and time in UTC when notification created
-        /// </summary>
-        public DateTime CreatedAt { get; set; }
-        
-        /// <summary>
-        ///     ID of user which marked notification as read.  
-        ///     Useful for notifications to shared accounts.  
-        /// </summary>
-        public string ReadById { get; set; }
-        
-        /// <summary>
-        ///     Date and time in UTC when notification marked as read.  
-        /// </summary>
-        public DateTime? ReadAt { get; set; }
+    }
 
-        public void Read([NotNull] string readById)
+    internal static NotificationRow<TData> New(
+        string type,
+        string recipientId,
+        TData data,
+        DateTimeOffset createdAt)
+    {
+        return new NotificationRow<TData>
         {
-            readById = readById ?? throw new ArgumentNullException(nameof(readById));
+            Id = Guid.NewGuid(),
+            RecipientId = recipientId ?? throw new ArgumentNullException(nameof(recipientId)),
+            Data = data,
+            IsRead = false,
+            CreatedAt = createdAt,
+            Type = type ?? throw new ArgumentNullException(nameof(type)),
+        };
+    }
 
-            IsRead = true;
-            ReadById = readById;
-            ReadAt = DateTime.UtcNow;
-        }
+    public void Read(string readById)
+    {
+        readById = readById ?? throw new ArgumentNullException(nameof(readById));
+
+        IsRead = true;
+        ReadById = readById;
+        ReadAt = DateTimeOffset.UtcNow;
+    }
+
+    internal Notification<TData> ToNotification()
+    {
+        return new Notification<TData>(Id, Type, RecipientId, IsRead, CreatedAt, ReadAt, ReadById, Data);
     }
 }
