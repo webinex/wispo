@@ -35,7 +35,6 @@ public static class WispoConfigurationExtensions
             typeof(IWispoFcmMessageMapperFactory<>).MakeGenericType(configuration.DataType),
             typeof(DefaultWispoFcmMessageMapperFactory<>).MakeGenericType(configuration.DataType));
         services.TryAddScoped<IWispoFcmDevicesService, WispoFcmDevicesService>();
-        services.TryAddScoped(typeof(IWispoFcmDevicesDbContext), cfg.DbContextType);
 
         services.AddScoped<IWispoFcmSender, WispoFcmSender>();
         services.AddSingleton(new WispoFcmOptions { FcmJsonCredentialData = cfg.FcmJsonCredentialData, });
@@ -86,7 +85,6 @@ public interface IWispoFcmConfiguration
 internal class WispoFcmConfiguration : IWispoFcmConfiguration
 {
     public IServiceCollection Services { get; }
-    public Type? DbContextType { get; private set; }
     public string? FcmJsonCredentialData { get; private set; }
     public TimeSpan ConsiderStaleAfter { get; private set; } = TimeSpan.FromDays(30);
 
@@ -95,14 +93,11 @@ internal class WispoFcmConfiguration : IWispoFcmConfiguration
         Services = configuration.Services;
     }
 
-    [MemberNotNull(nameof(FcmJsonCredentialData), nameof(DbContextType))]
+    [MemberNotNull(nameof(FcmJsonCredentialData))]
     public void Validate()
     {
         if (FcmJsonCredentialData == null)
             throw new InvalidOperationException("FcmJsonCredentialData must be provided");
-
-        if (DbContextType == null)
-            throw new InvalidOperationException("DbContextType must be provided");
     }
 
 
@@ -126,7 +121,7 @@ internal class WispoFcmConfiguration : IWispoFcmConfiguration
         if (!dbContext.IsAssignableTo(typeof(IWispoFcmDevicesDbContext)))
             throw new ArgumentException($"dbContext must implements {nameof(IWispoFcmDevicesDbContext)}");
 
-        DbContextType = dbContext;
+        Services.TryAddScoped(typeof(IWispoFcmDevicesDbContext), dbContext);
         return this;
     }
 }

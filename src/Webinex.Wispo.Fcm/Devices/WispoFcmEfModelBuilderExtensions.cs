@@ -8,7 +8,7 @@ public static class WispoFcmEfModelBuilderExtensions
 {
     public static ModelBuilder AddWispoFcmDevices(
         this ModelBuilder modelBuilder,
-        Action<EntityTypeBuilder<WispoFcmDevice>> configure)
+        Action<EntityTypeBuilder<WispoFcmDevice>>? configure = null)
     {
         modelBuilder.Entity<WispoFcmDevice>(builder =>
         {
@@ -26,7 +26,7 @@ public static class WispoFcmEfModelBuilderExtensions
             builder.HasIndex(e => e.Token).IsUnique();
             builder.HasIndex(e => e.RecipientId);
 
-            configure(builder);
+            configure?.Invoke(builder);
         });
 
         return modelBuilder;

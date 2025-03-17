@@ -49,6 +49,9 @@ internal class WispoFcmFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
 
     private async Task SendPushNotifications(Notification<TData>[] notifications)
     {
+        if (notifications.Length == 0)
+            return;
+
         var devicesByRecipientId = await _devicesService.GetMapByRecipientIdAsync(
             notifications.Select(e => e.RecipientId));
         var mapper = await _messageMapperFactory.GetMapper(notifications);
@@ -61,6 +64,9 @@ internal class WispoFcmFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
             foreach (var group in notifications.GroupBy(e => e.RecipientId))
             {
                 var devices = devicesByRecipientId[group.Key].ToArray();
+
+                if (devices.Length == 0)
+                    continue;
 
                 foreach (var notification in group)
                 {

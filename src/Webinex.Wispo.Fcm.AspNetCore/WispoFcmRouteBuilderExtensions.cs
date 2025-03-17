@@ -11,8 +11,8 @@ public static class WispoFcmRouteBuilderExtensions
 {
     public static IEndpointRouteBuilder MapWispoFcmDevicesApi(
         this IEndpointRouteBuilder endpoints,
-        string route = "/api/wispo/fcm/devices",
-        Action<RouteHandlerBuilder>? configure = null)
+        Action<RouteHandlerBuilder>? configure = null,
+        string route = "/api/wispo/fcm/devices")
     {
         var registerDevice = endpoints.MapPut(
                 route,
@@ -39,8 +39,8 @@ public static class WispoFcmRouteBuilderExtensions
 
     public static IEndpointRouteBuilder MapWispoFcmWebConfigApi(
         this IEndpointRouteBuilder endpoints,
-        string route = "/api/wispo/fcm/web/config",
-        Action<RouteHandlerBuilder>? configure = null)
+        Action<RouteHandlerBuilder>? configure = null,
+        string route = "/api/wispo/fcm/web/config")
     {
         var getWebConfig = endpoints.MapGet(
                 route,

@@ -54,6 +54,10 @@ internal class WispoFcmDevicesService : IWispoFcmDevicesService
     public async Task<WispoFcmDevice[]> GetAsync(IEnumerable<Guid> ids)
     {
         ids = ids.Distinct().ToArray();
+
+        if (!ids.Any())
+            return [];
+        
         return await DbSet.Where(e => ids.Contains(e.Id)).ToArrayAsync();
     }
 
@@ -62,6 +66,9 @@ internal class WispoFcmDevicesService : IWispoFcmDevicesService
         bool notStale = true)
     {
         recipientIds = recipientIds.Distinct().ToArray();
+
+        if (!recipientIds.Any())
+            return Array.Empty<(string, WispoFcmDevice)>().ToLookup(e => e.Item1, e => e.Item2);
 
         var queryable = DbSet.Where(e => recipientIds.Contains(e.RecipientId));
 

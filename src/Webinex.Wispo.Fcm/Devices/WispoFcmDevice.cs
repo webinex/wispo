@@ -35,7 +35,7 @@ public class WispoFcmDevice
     {
         RecipientId = recipientId;
         Meta = meta;
-        UpdatedAt = DateTimeOffset.UtcNow;
+        UpdateTimestamp();
     }
 
     public void UpdateTimestamp()

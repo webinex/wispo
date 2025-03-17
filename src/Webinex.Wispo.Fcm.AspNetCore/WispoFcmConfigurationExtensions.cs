@@ -5,6 +5,9 @@ namespace Webinex.Wispo.Fcm.AspNetCore;
 
 public static class WispoFcmConfigurationExtensions
 {
+    /// <summary>
+    /// Adds required services for Wispo Devices API 
+    /// </summary>
     public static IWispoFcmConfiguration AddDevicesApiServices(this IWispoFcmConfiguration @this)
     {
         @this.Services
@@ -13,7 +16,10 @@ public static class WispoFcmConfigurationExtensions
         return @this;
     }
 
-    public static IWispoFcmConfiguration AddWebConfigServices(
+    /// <summary>
+    /// Adds required services for Wispo Web Config API 
+    /// </summary>
+    public static IWispoFcmConfiguration AddWebConfigApiServices(
         this IWispoFcmConfiguration @this,
         Action<WispoFcmWebConfig> configure)
     {
@@ -25,24 +31,32 @@ public static class WispoFcmConfigurationExtensions
 
         return @this;
     }
+
+    /// <summary>
+    /// Adds a job that cleans up the database from staled devices. By default runs every 12 hours.
+    /// </summary>
+    public static IWispoFcmConfiguration AddAutoCleanJob(this IWispoFcmConfiguration @this, TimeSpan? cleanEvery = null)
+    {
+        cleanEvery ??= TimeSpan.FromHours(12);
+        // TODO: implement
+        // @this.Services.AddHostedService()
+        return @this;
+    }
 }
 
 public class WispoFcmWebConfig
 {
-    public string JsonCredentialData { get; init; } = null!;
-    public string ApiKey { get; init; } = null!;
-    public string AuthDomain { get; init; } = null!;
-    public string ProjectId { get; init; } = null!;
-    public string StorageBucket { get; init; } = null!;
-    public string MessagingSenderId { get; init; } = null!;
-    public string AppId { get; init; } = null!;
-    public string VapidKey { get; init; } = null!;
-    public string? MeasurementId { get; init; }
+    public string ApiKey { get; set; } = null!;
+    public string AuthDomain { get; set; } = null!;
+    public string ProjectId { get; set; } = null!;
+    public string StorageBucket { get; set; } = null!;
+    public string MessagingSenderId { get; set; } = null!;
+    public string AppId { get; set; } = null!;
+    public string VapidKey { get; set; } = null!;
+    public string? MeasurementId { get; set; }
 
     internal void Validate()
     {
-        if (string.IsNullOrWhiteSpace(JsonCredentialData))
-            throw new ArgumentException("JsonCredentialData is required");
         if (string.IsNullOrWhiteSpace(ApiKey))
             throw new ArgumentException("ApiKey is required");
         if (string.IsNullOrWhiteSpace(AuthDomain))
