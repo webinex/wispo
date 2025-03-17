@@ -22,7 +22,7 @@ public static class WispoConfigurationExtensions
         configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         configure = configure ?? throw new ArgumentNullException(nameof(configure));
 
-        var cfg = new WispoFcmConfiguration();
+        var cfg = new WispoFcmConfiguration(configuration);
         configure(cfg);
         cfg.Validate();
 
@@ -58,6 +58,11 @@ internal class WispoFcmDevicesOptions
 public interface IWispoFcmConfiguration
 {
     /// <summary>
+    /// Service collection. Can be used in child packages.
+    /// </summary>
+    IServiceCollection Services { get; }
+
+    /// <summary>
     /// Sets FCM JSON credential data. This data will be used to communicate with FCM
     /// </summary>
     IWispoFcmConfiguration UseFcmJsonCredentialData(string data);
@@ -80,9 +85,15 @@ public interface IWispoFcmConfiguration
 
 internal class WispoFcmConfiguration : IWispoFcmConfiguration
 {
-    public Type? DbContextType { get; set; }
-    public string? FcmJsonCredentialData { get; set; }
-    public TimeSpan ConsiderStaleAfter { get; set; } = TimeSpan.FromDays(30);
+    public IServiceCollection Services { get; }
+    public Type? DbContextType { get; private set; }
+    public string? FcmJsonCredentialData { get; private set; }
+    public TimeSpan ConsiderStaleAfter { get; private set; } = TimeSpan.FromDays(30);
+
+    public WispoFcmConfiguration(IWispoConfiguration configuration)
+    {
+        Services = configuration.Services;
+    }
 
     [MemberNotNull(nameof(FcmJsonCredentialData), nameof(DbContextType))]
     public void Validate()
@@ -93,6 +104,7 @@ internal class WispoFcmConfiguration : IWispoFcmConfiguration
         if (DbContextType == null)
             throw new InvalidOperationException("DbContextType must be provided");
     }
+
 
     public IWispoFcmConfiguration UseFcmJsonCredentialData(string data)
     {

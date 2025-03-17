@@ -9,8 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Webinex.Wispo.Fcm\Webinex.Wispo.Fcm.csproj" />
     <ProjectReference Include="..\Webinex.Wispo\Webinex.Wispo.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
   </ItemGroup>
 
 </Project>

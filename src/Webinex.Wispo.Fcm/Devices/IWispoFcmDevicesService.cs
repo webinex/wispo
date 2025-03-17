@@ -14,8 +14,22 @@ public interface IWispoFcmDevicesService
     Task<ILookup<string, WispoFcmDevice>> GetMapByRecipientIdAsync(IEnumerable<string> recipientIds,
         bool notStale = true);
 
-    Task<WispoFcmDevice> AddOrUpdateAsync(string token, string recipientId, string? meta);
+    Task<WispoFcmDevice> AddOrUpdateAsync(WispoAddOrUpdateFcmDeviceArgs args);
     Task<WispoFcmDevice[]> RemoveStaleAsync();
+}
+
+public class WispoAddOrUpdateFcmDeviceArgs
+{
+    public string Token { get; init; }
+    public string RecipientId { get; init; }
+    public string? Meta { get; init; }
+
+    public WispoAddOrUpdateFcmDeviceArgs(string token, string recipientId, string? meta)
+    {
+        Token = token ?? throw new ArgumentNullException(nameof(token));
+        RecipientId = recipientId ?? throw new ArgumentNullException(nameof(recipientId));
+        Meta = meta;
+    }
 }
 
 internal class WispoFcmDevicesService : IWispoFcmDevicesService
@@ -58,21 +72,21 @@ internal class WispoFcmDevicesService : IWispoFcmDevicesService
         return tokens.ToLookup(e => e.RecipientId);
     }
 
-    public async Task<WispoFcmDevice> AddOrUpdateAsync(string token, string recipientId, string? meta)
+    public async Task<WispoFcmDevice> AddOrUpdateAsync(WispoAddOrUpdateFcmDeviceArgs args)
     {
-        var device = await DbSet.FirstOrDefaultAsync(e => e.Token == token);
+        var device = await DbSet.FirstOrDefaultAsync(e => e.Token == args.Token);
 
         if (device != null)
         {
-            device.Update(recipientId, meta);
+            device.Update(args.RecipientId, args.Meta);
         }
         else
         {
             device = new WispoFcmDevice(
                 id: Guid.NewGuid(),
-                token,
-                recipientId,
-                meta,
+                args.Token,
+                args.RecipientId,
+                args.Meta,
                 updatedAt: DateTimeOffset.UtcNow,
                 createdAt: DateTimeOffset.UtcNow);
 
