@@ -2,7 +2,7 @@
   "name": "@webinex/wispo-fcm",
   "description": "Webinex Wispo FCM integration",
   "private": false,
-  "version": "3.0.0-build2",
+  "version": "3.0.0",
   "author": "Webinex Dev",
   "license": "Apache-2.0",
   "type": "module",
