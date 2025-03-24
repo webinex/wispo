@@ -1,34 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
-using Webinex.Wispo.Fcm.Devices;
+using Webinex.Wispo.FCM.Devices;
 using Webinex.Wispo.Ports;
 
-namespace Webinex.Wispo.Fcm;
+namespace Webinex.Wispo.FCM;
 
-internal class WispoFcmFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
+internal class WispoFCMFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
 {
     private readonly IWispoFeedbackPort<TData> _next;
-    private readonly IWispoFcmDevicesService _devicesService;
+    private readonly IWispoFCMDevicesService _devicesService;
     private readonly ILogger _logger;
-    private readonly IWispoFcmMessageMapperFactory<TData> _messageMapperFactory;
-    private readonly IWispoFcmSender _wispoFcmSender;
+    private readonly IWispoFCMMessagesMapper<TData> _messagesMapper;
+    private readonly IWispoFCMSender _wispoFCMSender;
 
-    public WispoFcmFeedbackAdapter(
+    public WispoFCMFeedbackAdapter(
         IWispoFeedbackPort<TData> next,
-        IWispoFcmDevicesService devicesService,
-        ILogger<WispoFcmFeedbackAdapter<TData>> logger,
-        IWispoFcmMessageMapperFactory<TData> messageMapperFactory,
-        IWispoFcmSender wispoFcmSender)
+        IWispoFCMDevicesService devicesService,
+        ILogger<WispoFCMFeedbackAdapter<TData>> logger,
+        IWispoFCMMessagesMapper<TData> messagesMapper,
+        IWispoFCMSender wispoFCMSender)
     {
         _next = next;
         _devicesService = devicesService;
         _logger = logger;
-        _messageMapperFactory = messageMapperFactory;
-        _wispoFcmSender = wispoFcmSender;
+        _messagesMapper = messagesMapper;
+        _wispoFCMSender = wispoFCMSender;
     }
 
     public async Task SendNewAsync(IEnumerable<Notification<TData>> notifications)
@@ -54,12 +55,12 @@ internal class WispoFcmFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
 
         var devicesByRecipientId = await _devicesService.GetMapByRecipientIdAsync(
             notifications.Select(e => e.RecipientId));
-        var mapper = await _messageMapperFactory.GetMapper(notifications);
 
-        await _wispoFcmSender.SendAsync(EnumerateArgs());
+        var mapped = await _messagesMapper.MapAsync(EnumerateArgs());
+        await _wispoFCMSender.SendAsync(mapped);
         return;
 
-        IEnumerable<(WispoFcmDevice, Message)> EnumerateArgs()
+        IEnumerable<(WispoFCMDevice, Notification<TData>)> EnumerateArgs()
         {
             foreach (var group in notifications.GroupBy(e => e.RecipientId))
             {
@@ -72,8 +73,7 @@ internal class WispoFcmFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
                 {
                     foreach (var device in devices)
                     {
-                        var message = mapper.Map(notification, device);
-                        yield return (device, message);
+                        yield return (device, notification);
                     }
                 }
             }

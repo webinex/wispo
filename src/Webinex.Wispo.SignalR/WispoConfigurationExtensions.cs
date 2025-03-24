@@ -18,7 +18,7 @@ public static class WispoConfigurationExtensions
     {
         configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-        configuration.AddFeedbackAdapter(
+        configuration.AppendFeedbackAdapter(
             typeof(SignalRHubWispoFeedbackAdapter<,>).MakeGenericType(configuration.DataType, typeof(THub)));
 
         return configuration;

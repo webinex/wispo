@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
 
-namespace Webinex.Wispo.Fcm.AspNetCore;
+namespace Webinex.Wispo.FCM.AspNetCore;
 
-public class WispoFcmRegisterDeviceDto
+public class WispoFCMRegisterDeviceDto
 {
     [Required]
     public string Token { get; init; } = null!;

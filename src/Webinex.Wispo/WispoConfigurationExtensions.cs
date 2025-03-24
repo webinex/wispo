@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Webinex.Wispo.Ports;
 
@@ -7,7 +9,11 @@ namespace Webinex.Wispo;
 
 public static class WispoConfigurationExtensions
 {
-    public static IWispoConfiguration AddFeedbackAdapter(this IWispoConfiguration @this, Type adapterType)
+    /// <summary>
+    /// Adds or appends feedback adapter to the Wispo configuration.
+    /// Every new feedback will be added via decoration of already existing last one.
+    /// </summary>
+    public static IWispoConfiguration AppendFeedbackAdapter(this IWispoConfiguration @this, Type adapterType)
     {
         var serviceType = typeof(IWispoFeedbackPort<>).MakeGenericType(@this.DataType);
 
@@ -15,17 +21,27 @@ public static class WispoConfigurationExtensions
             throw new ArgumentException(
                 $"Feedback adapter type '{adapterType.Name}' must implement 'IWispoFeedbackPort<>' interface");
 
-        var descriptor = @this.Services.SingleOrDefault(x => x.ServiceType == serviceType);
-
-        if (descriptor == null)
+        if (@this.Services.All(x => x.ServiceType != serviceType))
         {
-            @this.Services.AddScoped(serviceType, adapterType);
-            return @this;
+            var defaultImplementation = typeof(EmptyWispoFeedbackAdapter<>).MakeGenericType(@this.DataType);
+            @this.Services.AddScoped(serviceType, defaultImplementation);
         }
 
-        var originalFeedbackType = descriptor.ImplementationType ?? throw new ArgumentNullException();
-        @this.Services.TryDecorate(originalFeedbackType, adapterType);
+        @this.Services.Decorate(serviceType, adapterType);
 
         return @this;
+    }
+}
+
+internal class EmptyWispoFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
+{
+    public Task SendNewAsync(IEnumerable<Notification<TData>> notifications)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task SendReadAsync(IEnumerable<Notification<TData>> notifications)
+    {
+        return Task.CompletedTask;
     }
 }

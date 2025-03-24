@@ -3,9 +3,10 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <PackageId>Webinex.Wispo.Fcm.AspNetCore</PackageId>
+    <PackageId>Webinex.Wispo.FCM.AspNetCore</PackageId>
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
+    <RootNamespace>Webinex.Wispo.FCM.AspNetCore</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Webinex.Wispo.Fcm\Webinex.Wispo.Fcm.csproj" />
+    <ProjectReference Include="..\Webinex.Wispo.FCM\Webinex.Wispo.FCM.csproj" />
     <ProjectReference Include="..\Webinex.Wispo\Webinex.Wispo.csproj"/>
   </ItemGroup>
 

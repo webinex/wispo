@@ -1,8 +1,8 @@
 using System;
 
-namespace Webinex.Wispo.Fcm.Devices;
+namespace Webinex.Wispo.FCM.Devices;
 
-public class WispoFcmDevice
+public class WispoFCMDevice
 {
     public Guid Id { get; protected init; }
     public string Token { get; protected init; } = null!;
@@ -11,11 +11,11 @@ public class WispoFcmDevice
     public DateTimeOffset UpdatedAt { get; protected set; }
     public DateTimeOffset CreatedAt { get; protected init; }
 
-    protected WispoFcmDevice()
+    protected WispoFCMDevice()
     {
     }
 
-    public WispoFcmDevice(
+    public WispoFCMDevice(
         Guid id,
         string token,
         string userId,

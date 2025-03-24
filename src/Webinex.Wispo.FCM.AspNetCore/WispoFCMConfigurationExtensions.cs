@@ -1,17 +1,17 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Webinex.Wispo.Fcm.AspNetCore;
+namespace Webinex.Wispo.FCM.AspNetCore;
 
-public static class WispoFcmConfigurationExtensions
+public static class WispoFCMConfigurationExtensions
 {
     /// <summary>
     /// Adds required services for Wispo Devices API 
     /// </summary>
-    public static IWispoFcmConfiguration AddDevicesApiServices(this IWispoFcmConfiguration @this)
+    public static IWispoFCMConfiguration AddDevicesApiServices(this IWispoFCMConfiguration @this)
     {
-        @this.Services
-            .TryAddSingleton<IWispoFcmDeviceDtoMapper, DefaultWispoFcmDeviceDtoMapper>();
+        @this.Services.TryAddSingleton<IWispoFCMRecipientIdResolver, HttpContextWispoFCMRecipientIdResolver>();
+        @this.Services.TryAddSingleton<IWispoFCMDeviceDtoMapper, DefaultWispoFCMDeviceDtoMapper>();
 
         return @this;
     }
@@ -19,11 +19,11 @@ public static class WispoFcmConfigurationExtensions
     /// <summary>
     /// Adds required services for Wispo Web Config API 
     /// </summary>
-    public static IWispoFcmConfiguration AddWebConfigApiServices(
-        this IWispoFcmConfiguration @this,
-        Action<WispoFcmWebConfig> configure)
+    public static IWispoFCMConfiguration AddWebConfigApiServices(
+        this IWispoFCMConfiguration @this,
+        Action<WispoFCMWebConfig> configure)
     {
-        var options = new WispoFcmWebConfig();
+        var options = new WispoFCMWebConfig();
         configure(options);
         options.Validate();
 
@@ -35,7 +35,7 @@ public static class WispoFcmConfigurationExtensions
     /// <summary>
     /// Adds a job that cleans up the database from staled devices. By default runs every 12 hours.
     /// </summary>
-    public static IWispoFcmConfiguration AddAutoCleanJob(this IWispoFcmConfiguration @this, TimeSpan? cleanEvery = null)
+    public static IWispoFCMConfiguration AddAutoCleanJob(this IWispoFCMConfiguration @this, TimeSpan? cleanEvery = null)
     {
         cleanEvery ??= TimeSpan.FromHours(12);
         // TODO: implement
@@ -44,7 +44,7 @@ public static class WispoFcmConfigurationExtensions
     }
 }
 
-public class WispoFcmWebConfig
+public class WispoFCMWebConfig
 {
     public string ApiKey { get; set; } = null!;
     public string AuthDomain { get; set; } = null!;

@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Webinex.Wispo.Fcm.Devices;
+using Webinex.Wispo.FCM.Devices;
 
-namespace Webinex.Wispo.Fcm.AspNetCore;
+namespace Webinex.Wispo.FCM.AspNetCore;
 
-public static class WispoFcmRouteBuilderExtensions
+public static class WispoFCMRouteBuilderExtensions
 {
-    public static IEndpointRouteBuilder MapWispoFcmDevicesApi(
+    public static IEndpointRouteBuilder MapWispoFCMDevicesApi(
         this IEndpointRouteBuilder endpoints,
         Action<RouteHandlerBuilder>? configure = null,
         string route = "/api/wispo/fcm/devices")
@@ -17,18 +17,18 @@ public static class WispoFcmRouteBuilderExtensions
         var registerDevice = endpoints.MapPut(
                 route,
                 async (
-                    [FromBody] WispoFcmRegisterDeviceDto dto,
-                    [FromServices] IWispoFcmDevicesService fcmDevicesService,
-                    [FromServices] IWispoFcmDeviceDtoMapper dtoMapper,
-                    [FromServices] IWispoFcmDevicesDbContext dbContext) =>
+                    [FromBody] WispoFCMRegisterDeviceDto dto,
+                    [FromServices] IWispoFCMDevicesService devicesService,
+                    [FromServices] IWispoFCMDeviceDtoMapper dtoMapper,
+                    [FromServices] IWispoFCMDevicesDbContext dbContext) =>
                 {
                     var args = await dtoMapper.Map(dto);
-                    await fcmDevicesService.AddOrUpdateAsync(args);
+                    await devicesService.AddOrUpdateAsync(args);
                     await dbContext.SaveChangesAsync();
 
                     return Results.Ok();
                 })
-            .WithGroupName("WispoFcmDevices")
+            .WithTags("WispoFCMDevices")
             .WithName("RegisterDevice")
             .WithOpenApi();
 
@@ -37,15 +37,15 @@ public static class WispoFcmRouteBuilderExtensions
         return endpoints;
     }
 
-    public static IEndpointRouteBuilder MapWispoFcmWebConfigApi(
+    public static IEndpointRouteBuilder MapWispoFCMWebConfigApi(
         this IEndpointRouteBuilder endpoints,
         Action<RouteHandlerBuilder>? configure = null,
         string route = "/api/wispo/fcm/web/config")
     {
         var getWebConfig = endpoints.MapGet(
                 route,
-                ([FromServices] WispoFcmWebConfig options) => Results.Ok(options))
-            .WithGroupName("WispoFcmWeb")
+                ([FromServices] WispoFCMWebConfig options) => Results.Ok(options))
+            .WithTags("WispoFCMWeb")
             .WithName("GetConfig")
             .WithOpenApi();
 

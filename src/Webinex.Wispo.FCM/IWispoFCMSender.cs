@@ -6,37 +6,37 @@ using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Logging;
-using Webinex.Wispo.Fcm.Devices;
+using Webinex.Wispo.FCM.Devices;
 
-namespace Webinex.Wispo.Fcm;
+namespace Webinex.Wispo.FCM;
 
-internal interface IWispoFcmSender
+internal interface IWispoFCMSender
 {
-    Task SendAsync(IEnumerable<(WispoFcmDevice Device, Message Message)> messages);
+    Task SendAsync(IEnumerable<(WispoFCMDevice Device, Message Message)> messages);
 }
 
-internal class WispoFcmSender : IWispoFcmSender
+internal class WispoFCMSender : IWispoFCMSender
 {
     private const string FIREBASE_APP_NAME = "WISPO_FCM_APP";
     private const int MAX_MESSAGES_PER_CHUNK = 100;
 
     private readonly Lazy<FirebaseMessaging> _messaging;
-    private readonly ILogger<WispoFcmSender> _logger;
+    private readonly ILogger<WispoFCMSender> _logger;
 
-    public WispoFcmSender(WispoFcmOptions options, ILogger<WispoFcmSender> logger)
+    public WispoFCMSender(WispoFCMOptions options, ILogger<WispoFCMSender> logger)
     {
         _logger = logger;
         _messaging = new Lazy<FirebaseMessaging>(() =>
         {
             var app = FirebaseApp.Create(new AppOptions
             {
-                Credential = GoogleCredential.FromJson(options.FcmJsonCredentialData),
+                Credential = GoogleCredential.FromJson(options.FCMJsonCredentialData),
             }, FIREBASE_APP_NAME);
             return FirebaseMessaging.GetMessaging(app);
         });
     }
 
-    public async Task SendAsync(IEnumerable<(WispoFcmDevice Device, Message Message)> messages)
+    public async Task SendAsync(IEnumerable<(WispoFCMDevice Device, Message Message)> messages)
     {
         foreach (var chunk in messages.Chunk(MAX_MESSAGES_PER_CHUNK))
         {
@@ -44,7 +44,7 @@ internal class WispoFcmSender : IWispoFcmSender
         }
     }
 
-    private async Task SendAsync(WispoFcmDevice device, Message message)
+    private async Task SendAsync(WispoFCMDevice device, Message message)
     {
         try
         {

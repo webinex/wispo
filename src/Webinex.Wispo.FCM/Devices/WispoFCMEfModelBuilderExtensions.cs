@@ -2,17 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Webinex.Wispo.Fcm.Devices;
+namespace Webinex.Wispo.FCM.Devices;
 
-public static class WispoFcmEfModelBuilderExtensions
+public static class WispoFCMEfModelBuilderExtensions
 {
-    public static ModelBuilder AddWispoFcmDevices(
+    public static ModelBuilder AddWispoFCMDevices(
         this ModelBuilder modelBuilder,
-        Action<EntityTypeBuilder<WispoFcmDevice>>? configure = null)
+        Action<EntityTypeBuilder<WispoFCMDevice>>? configure = null)
     {
-        modelBuilder.Entity<WispoFcmDevice>(builder =>
+        modelBuilder.Entity<WispoFCMDevice>(builder =>
         {
-            builder.ToTable("WispoFcmDevices").HasKey(e => e.Id);
+            builder.ToTable("WispoFCMDevices").HasKey(e => e.Id);
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
