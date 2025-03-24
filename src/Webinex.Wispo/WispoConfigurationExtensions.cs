@@ -10,8 +10,8 @@ namespace Webinex.Wispo;
 public static class WispoConfigurationExtensions
 {
     /// <summary>
-    /// Adds or appends feedback adapter to the Wispo configuration.
-    /// Every new feedback will be added via decoration of already existing last one.
+    /// Appends feedback adapter to the Wispo configuration.
+    /// Every new feedback will be added via decoration of already existing registration.
     /// </summary>
     public static IWispoConfiguration AppendFeedbackAdapter(this IWispoConfiguration @this, Type adapterType)
     {
