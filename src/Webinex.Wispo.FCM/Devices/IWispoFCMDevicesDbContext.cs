@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace Webinex.Wispo.FCM.Devices;
@@ -6,5 +7,5 @@ namespace Webinex.Wispo.FCM.Devices;
 public interface IWispoFCMDevicesDbContext
 {
     DbSet<WispoFCMDevice> WispoFCMDevices { get; }
-    Task SaveChangesAsync();
+    Task SaveChangesAsync(CancellationToken cancellationToken);
 }

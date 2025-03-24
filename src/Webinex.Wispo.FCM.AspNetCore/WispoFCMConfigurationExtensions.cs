@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Webinex.Wispo.FCM.AspNetCore;
@@ -35,11 +36,15 @@ public static class WispoFCMConfigurationExtensions
     /// <summary>
     /// Adds a job that cleans up the database from staled devices. By default runs every 12 hours.
     /// </summary>
-    public static IWispoFCMConfiguration AddAutoCleanJob(this IWispoFCMConfiguration @this, TimeSpan? cleanEvery = null)
+    public static IWispoFCMConfiguration AddStaleDevicesCleaningJob(
+        this IWispoFCMConfiguration @this,
+        TimeSpan? cleaningInterval = null)
     {
-        cleanEvery ??= TimeSpan.FromHours(12);
-        // TODO: implement
-        // @this.Services.AddHostedService()
+        cleaningInterval ??= TimeSpan.FromHours(12);
+        @this.Services
+            .AddSingleton(new WispoFCMStaleDevicesCleaningJobOptions(cleaningInterval.Value))
+            .AddHostedService<WispoFCMStaleDevicesCleaningJob>();
+
         return @this;
     }
 }

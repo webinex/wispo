@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ public static class WispoFCMRouteBuilderExtensions
                 {
                     var args = await dtoMapper.Map(dto);
                     await devicesService.AddOrUpdateAsync(args);
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(CancellationToken.None);
 
                     return Results.Ok();
                 })
