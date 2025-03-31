@@ -5,7 +5,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>Webinex.Wispo.AspNetCore</PackageId>
     <RootNamespace>Webinex.Wispo.AspNetCore</RootNamespace>
-    <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

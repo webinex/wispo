@@ -8,23 +8,23 @@ namespace Webinex.Wispo.FCM.AspNetCore;
 
 public interface IWispoFCMDeviceDtoMapper
 {
-    Task<WispoAddOrUpdateFCMDeviceArgs> Map(WispoFCMRegisterDeviceDto dto);
+    Task<FCMDeviceRawValue> MapAsync(WispoFCMRegisterDeviceDto dto);
 }
 
 internal class DefaultWispoFCMDeviceDtoMapper : IWispoFCMDeviceDtoMapper
 {
-    private readonly IWispoFCMRecipientIdResolver _recipientIdResolver;
+    private readonly IWispoFCMContext _context;
 
-    public DefaultWispoFCMDeviceDtoMapper(IWispoFCMRecipientIdResolver recipientIdResolver)
+    public DefaultWispoFCMDeviceDtoMapper(IWispoFCMContext context)
     {
-        _recipientIdResolver = recipientIdResolver;
+        _context = context;
     }
 
-    public async Task<WispoAddOrUpdateFCMDeviceArgs> Map(WispoFCMRegisterDeviceDto dto)
+    public async Task<FCMDeviceRawValue> MapAsync(WispoFCMRegisterDeviceDto dto)
     {
-        var recipientId = await _recipientIdResolver.Resolve();
+        var context = await _context.Resolve();
 
-        return new WispoAddOrUpdateFCMDeviceArgs(dto.Token, recipientId, GetMeta(dto));
+        return new FCMDeviceRawValue(dto.Token, context.RecipientId, GetMeta(dto));
     }
 
     private static string GetMeta(WispoFCMRegisterDeviceDto dto)

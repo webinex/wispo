@@ -6,13 +6,12 @@ using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Logging;
-using Webinex.Wispo.FCM.Devices;
 
 namespace Webinex.Wispo.FCM;
 
 internal interface IWispoFCMSender
 {
-    Task SendAsync(IEnumerable<(WispoFCMDevice Device, Message Message)> messages);
+    Task SendAsync(IEnumerable<Message> messages);
 }
 
 internal class WispoFCMSender : IWispoFCMSender
@@ -30,21 +29,21 @@ internal class WispoFCMSender : IWispoFCMSender
         {
             var app = FirebaseApp.Create(new AppOptions
             {
-                Credential = GoogleCredential.FromJson(options.FCMJsonCredentialData),
+                Credential = GoogleCredential.FromJson(options.JsonCredentialData),
             }, FIREBASE_APP_NAME);
             return FirebaseMessaging.GetMessaging(app);
         });
     }
 
-    public async Task SendAsync(IEnumerable<(WispoFCMDevice Device, Message Message)> messages)
+    public async Task SendAsync(IEnumerable<Message> messages)
     {
         foreach (var chunk in messages.Chunk(MAX_MESSAGES_PER_CHUNK))
         {
-            await Task.WhenAll(chunk.Select(e => SendAsync(e.Device, e.Message)));
+            await Task.WhenAll(chunk.Select(e => SendAsync(e)));
         }
     }
 
-    private async Task SendAsync(WispoFCMDevice device, Message message)
+    private async Task SendAsync(Message message)
     {
         try
         {
@@ -59,8 +58,8 @@ internal class WispoFCMSender : IWispoFCMSender
         {
             _logger.LogError(
                 e,
-                "Failed to send notification to device {DeviceTokenId}. Error message: '{ErrorMessage}'",
-                device.Id,
+                "Failed to send notification to device token {DeviceToken}. Error message: '{ErrorMessage}'",
+                message.Token,
                 e.Message);
         }
     }

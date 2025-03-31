@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
 using Webinex.Wispo.FCM.Devices;
 using Webinex.Wispo.Ports;
@@ -13,22 +11,22 @@ namespace Webinex.Wispo.FCM;
 internal class WispoFCMFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
 {
     private readonly IWispoFeedbackPort<TData> _next;
-    private readonly IWispoFCMDevicesService _devicesService;
+    private readonly IWispoFCMDeviceService _deviceService;
     private readonly ILogger _logger;
-    private readonly IWispoFCMMessagesMapper<TData> _messagesMapper;
+    private readonly IWispoFCMMessageMapper<TData> _messageMapper;
     private readonly IWispoFCMSender _wispoFCMSender;
 
     public WispoFCMFeedbackAdapter(
         IWispoFeedbackPort<TData> next,
-        IWispoFCMDevicesService devicesService,
+        IWispoFCMDeviceService deviceService,
         ILogger<WispoFCMFeedbackAdapter<TData>> logger,
-        IWispoFCMMessagesMapper<TData> messagesMapper,
+        IWispoFCMMessageMapper<TData> messageMapper,
         IWispoFCMSender wispoFCMSender)
     {
         _next = next;
-        _devicesService = devicesService;
+        _deviceService = deviceService;
         _logger = logger;
-        _messagesMapper = messagesMapper;
+        _messageMapper = messageMapper;
         _wispoFCMSender = wispoFCMSender;
     }
 
@@ -53,10 +51,10 @@ internal class WispoFCMFeedbackAdapter<TData> : IWispoFeedbackPort<TData>
         if (notifications.Length == 0)
             return;
 
-        var devicesByRecipientId = await _devicesService.GetMapByRecipientIdAsync(
+        var devicesByRecipientId = await _deviceService.GetMapByRecipientIdAsync(
             notifications.Select(e => e.RecipientId));
 
-        var mapped = await _messagesMapper.MapAsync(EnumerateArgs());
+        var mapped = await _messageMapper.MapAsync(EnumerateArgs());
         await _wispoFCMSender.SendAsync(mapped);
         return;
 

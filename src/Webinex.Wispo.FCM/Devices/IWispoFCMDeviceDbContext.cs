@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Webinex.Wispo.FCM.Devices;
 
-public interface IWispoFCMDevicesDbContext
+public interface IWispoFCMDeviceDbContext
 {
-    DbSet<WispoFCMDevice> WispoFCMDevices { get; }
+    DbSet<WispoFCMDevice> Devices { get; }
     Task SaveChangesAsync(CancellationToken cancellationToken);
 }

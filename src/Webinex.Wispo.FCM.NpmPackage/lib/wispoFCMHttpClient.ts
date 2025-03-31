@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance } from 'axios';
 
 export interface WispoFCMHttpClientSettings {
   /**
@@ -45,10 +45,8 @@ export class WispoFCMHttpClient {
 
   constructor(args?: WispoFCMHttpClientSettings) {
     this._axios = args?.axios ?? axios.create();
-    this._registerDeviceRoute =
-      args?.routes?.registerDevice ?? "/api/wispo/fcm/devices";
-    this._getWebConfig =
-      args?.routes?.getWebConfig ?? "/api/wispo/fcm/web/config";
+    this._registerDeviceRoute = args?.routes?.registerDevice ?? '/api/wispo/fcm/devices';
+    this._getWebConfig = args?.routes?.getWebConfig ?? '/api/wispo/fcm/web-config';
   }
 
   public registerDevice = async (request: WispoFCMRegisterDeviceRequest) => {
@@ -56,9 +54,7 @@ export class WispoFCMHttpClient {
   };
 
   public getWebConfig = async () => {
-    const { data } = await this._axios.get<WispoFCMGetConfigResponse>(
-      this._getWebConfig
-    );
+    const { data } = await this._axios.get<WispoFCMGetConfigResponse>(this._getWebConfig);
     return data;
   };
 }

@@ -50,9 +50,9 @@ internal class WispoFCMStaleDevicesCleaningJob : BackgroundService
     {
         _logger.LogInformation("Trying to remove stale devices");
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var devicesService = scope.ServiceProvider.GetRequiredService<IWispoFCMDevicesService>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<IWispoFCMDevicesDbContext>();
-        var removed = await devicesService.RemoveStaleAsync();
+        var deviceService = scope.ServiceProvider.GetRequiredService<IWispoFCMDeviceService>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IWispoFCMDeviceDbContext>();
+        var removed = await deviceService.RemoveStaleAsync();
 
         if (!removed.Any())
         {

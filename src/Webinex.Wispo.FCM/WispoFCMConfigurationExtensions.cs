@@ -4,10 +4,10 @@ namespace Webinex.Wispo.FCM;
 
 public static class WispoFCMConfigurationExtensions
 {
-    public static IWispoFCMConfiguration AddDevicesDbContext<TDbContext>(this IWispoFCMConfiguration configuration)
-        where TDbContext : IWispoFCMDevicesDbContext
+    public static IWispoFCMConfiguration UseDevicesDbContext<TDbContext>(this IWispoFCMConfiguration configuration)
+        where TDbContext : IWispoFCMDeviceDbContext
     {
-        configuration.AddDevicesDbContext(typeof(TDbContext));
+        configuration.UseDevicesDbContext(typeof(TDbContext));
         return configuration;
     }
 }

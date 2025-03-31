@@ -7,9 +7,9 @@ using Webinex.Wispo.FCM.Devices;
 
 namespace Webinex.Wispo.FCM;
 
-public interface IWispoFCMMessagesMapper<TData>
+public interface IWispoFCMMessageMapper<TData>
 {
-    Task<IEnumerable<(WispoFCMDevice Device, Message Message)>> MapAsync(
+    Task<IEnumerable<Message>> MapAsync(
         IEnumerable<(WispoFCMDevice Device, Notification<TData> Notification)> notifications);
 }
 
@@ -19,12 +19,12 @@ public class WispoFCMDictMappedMessage
     public string? Body { get; set; }
 }
 
-internal class DictionaryWispoFCMMessagesMapper<TData> : IWispoFCMMessagesMapper<TData>
+internal class DictionaryWispoFCMMessageMapper<TData> : IWispoFCMMessageMapper<TData>
 {
     private readonly IReadOnlyDictionary<string, WispoFCMDictMappedMessage> _dict;
     private readonly Func<string, WispoFCMDictMappedMessage> _fallback;
 
-    public DictionaryWispoFCMMessagesMapper(
+    public DictionaryWispoFCMMessageMapper(
         IReadOnlyDictionary<string, WispoFCMDictMappedMessage> dict,
         Func<string, WispoFCMDictMappedMessage> fallback)
     {
@@ -32,7 +32,7 @@ internal class DictionaryWispoFCMMessagesMapper<TData> : IWispoFCMMessagesMapper
         _fallback = fallback;
     }
 
-    public Task<IEnumerable<(WispoFCMDevice Device, Message Message)>> MapAsync(
+    public Task<IEnumerable<Message>> MapAsync(
         IEnumerable<(WispoFCMDevice Device, Notification<TData> Notification)> notifications)
     {
         var result = notifications.Select(e =>
@@ -40,7 +40,7 @@ internal class DictionaryWispoFCMMessagesMapper<TData> : IWispoFCMMessagesMapper
             if (!_dict.TryGetValue(e.Notification.Type, out var message))
                 message = _fallback(e.Notification.Type);
 
-            return (e.Device, new Message
+            return new Message
             {
                 Token = e.Device.Token,
                 Notification = new Notification
@@ -48,19 +48,19 @@ internal class DictionaryWispoFCMMessagesMapper<TData> : IWispoFCMMessagesMapper
                     Title = message.Title,
                     Body = message.Body,
                 },
-            });
+            };
         });
 
         return Task.FromResult(result);
     }
 }
 
-internal class DefaultWispoFCMMessagesMapper<TData> : IWispoFCMMessagesMapper<TData>
+internal class DefaultWispoFCMMessageMapper<TData> : IWispoFCMMessageMapper<TData>
 {
-    public Task<IEnumerable<(WispoFCMDevice Device, Message Message)>> MapAsync(
+    public Task<IEnumerable<Message>> MapAsync(
         IEnumerable<(WispoFCMDevice Device, Notification<TData> Notification)> notifications)
     {
-        var result = notifications.Select(e => (e.Device, new Message
+        var result = notifications.Select(e => new Message
         {
             Token = e.Device.Token,
             Notification = new Notification
@@ -75,7 +75,7 @@ internal class DefaultWispoFCMMessagesMapper<TData> : IWispoFCMMessagesMapper<TD
                     Link = "https://webinex.github.io/wispo/docs/getting-started",
                 },
             },
-        }));
+        });
 
         return Task.FromResult(result);
     }

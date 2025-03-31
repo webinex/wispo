@@ -6,7 +6,6 @@
     <PackageId>Webinex.Wispo.Abstractions</PackageId>
     <RootNamespace>Webinex.Wispo</RootNamespace>
     <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

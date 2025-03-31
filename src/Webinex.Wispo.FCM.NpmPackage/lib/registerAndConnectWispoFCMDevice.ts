@@ -1,10 +1,7 @@
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
-import {
-  WispoFCMGetConfigResponse,
-  WispoFCMHttpClient,
-} from "./wispoFCMHttpClient";
-import { WISPO_FCM_MESSAGE_CONFIG_TYPE } from "./constants";
+import { initializeApp } from 'firebase/app';
+import { getMessaging, getToken } from 'firebase/messaging';
+import { WispoFCMGetConfigResponse, WispoFCMHttpClient } from './wispoFCMHttpClient';
+import { WISPO_FCM_MESSAGE_CONFIG_TYPE } from './constants';
 
 interface RegisterAndConnectWispoFCMDeviceOptions {
   wispoClient?: WispoFCMHttpClient;
@@ -33,22 +30,19 @@ export const registerAndConnectWispoFCMDevice = async ({
 
   await wispoClient.registerDevice({
     token,
-    deviceType: deviceType ?? "web",
+    deviceType: deviceType ?? 'web',
     extra: extraDetails,
   });
 };
 
-const connectWispoFCMWithSw = (
-  sw: ServiceWorkerRegistration,
-  config: WispoFCMGetConfigResponse
-) => {
+const connectWispoFCMWithSw = (sw: ServiceWorkerRegistration, config: WispoFCMGetConfigResponse) => {
   if (sw.active) {
     sw.active.postMessage({
       type: WISPO_FCM_MESSAGE_CONFIG_TYPE,
       payload: config,
     });
   } else {
-    sw.addEventListener("activate", () => {
+    sw.addEventListener('activate', () => {
       sw.active!.postMessage({
         type: WISPO_FCM_MESSAGE_CONFIG_TYPE,
         payload: config,

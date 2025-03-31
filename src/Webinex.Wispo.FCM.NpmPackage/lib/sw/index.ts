@@ -1,1 +1,1 @@
-export * from "./initializeWispoFCMSw";
+export * from './initializeWispoFCMSw';

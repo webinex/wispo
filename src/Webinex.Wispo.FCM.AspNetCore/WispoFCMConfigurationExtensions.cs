@@ -9,9 +9,9 @@ public static class WispoFCMConfigurationExtensions
     /// <summary>
     /// Adds required services for Wispo Devices API 
     /// </summary>
-    public static IWispoFCMConfiguration AddDevicesApiServices(this IWispoFCMConfiguration @this)
+    public static IWispoFCMConfiguration AddDeviceApiCore(this IWispoFCMConfiguration @this)
     {
-        @this.Services.TryAddSingleton<IWispoFCMRecipientIdResolver, HttpContextWispoFCMRecipientIdResolver>();
+        @this.Services.TryAddSingleton<IWispoFCMContext, HttpContextWispoFCMContext>();
         @this.Services.TryAddSingleton<IWispoFCMDeviceDtoMapper, DefaultWispoFCMDeviceDtoMapper>();
 
         return @this;
@@ -20,15 +20,13 @@ public static class WispoFCMConfigurationExtensions
     /// <summary>
     /// Adds required services for Wispo Web Config API 
     /// </summary>
-    public static IWispoFCMConfiguration AddWebConfigApiServices(
+    public static IWispoFCMConfiguration AddWebConfigApiCore(
         this IWispoFCMConfiguration @this,
-        Action<WispoFCMWebConfig> configure)
+        WispoFCMWebSettings settings)
     {
-        var options = new WispoFCMWebConfig();
-        configure(options);
-        options.Validate();
+        settings.Validate();
 
-        @this.Services.TryAddSingleton(options);
+        @this.Services.TryAddSingleton(settings);
 
         return @this;
     }
@@ -49,16 +47,16 @@ public static class WispoFCMConfigurationExtensions
     }
 }
 
-public class WispoFCMWebConfig
+public class WispoFCMWebSettings
 {
-    public string ApiKey { get; set; } = null!;
-    public string AuthDomain { get; set; } = null!;
-    public string ProjectId { get; set; } = null!;
-    public string StorageBucket { get; set; } = null!;
-    public string MessagingSenderId { get; set; } = null!;
-    public string AppId { get; set; } = null!;
-    public string VapidKey { get; set; } = null!;
-    public string? MeasurementId { get; set; }
+    public required string ApiKey { get; init; }
+    public required string AuthDomain { get; init; }
+    public required string ProjectId { get; init; }
+    public required string StorageBucket { get; init; }
+    public required string MessagingSenderId { get; init; }
+    public required string AppId { get; init; }
+    public required string VapidKey { get; init; }
+    public string? MeasurementId { get; init; }
 
     internal void Validate()
     {

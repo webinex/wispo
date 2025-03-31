@@ -19,11 +19,11 @@ public static class WispoFCMRouteBuilderExtensions
                 route,
                 async (
                     [FromBody] WispoFCMRegisterDeviceDto dto,
-                    [FromServices] IWispoFCMDevicesService devicesService,
+                    [FromServices] IWispoFCMDeviceService devicesService,
                     [FromServices] IWispoFCMDeviceDtoMapper dtoMapper,
-                    [FromServices] IWispoFCMDevicesDbContext dbContext) =>
+                    [FromServices] IWispoFCMDeviceDbContext dbContext) =>
                 {
-                    var args = await dtoMapper.Map(dto);
+                    var args = await dtoMapper.MapAsync(dto);
                     await devicesService.AddOrUpdateAsync(args);
                     await dbContext.SaveChangesAsync(CancellationToken.None);
 
@@ -41,11 +41,11 @@ public static class WispoFCMRouteBuilderExtensions
     public static IEndpointRouteBuilder MapWispoFCMWebConfigApi(
         this IEndpointRouteBuilder endpoints,
         Action<RouteHandlerBuilder>? configure = null,
-        string route = "/api/wispo/fcm/web/config")
+        string route = "/api/wispo/fcm/web-config")
     {
         var getWebConfig = endpoints.MapGet(
                 route,
-                ([FromServices] WispoFCMWebConfig options) => Results.Ok(options))
+                ([FromServices] WispoFCMWebSettings options) => Results.Ok(options))
             .WithTags("WispoFCMWeb")
             .WithName("GetConfig")
             .WithOpenApi();

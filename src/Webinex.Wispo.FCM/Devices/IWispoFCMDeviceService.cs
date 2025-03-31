@@ -7,12 +7,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Webinex.Wispo.FCM.Devices;
 
-public interface IWispoFCMDevicesService
+public interface IWispoFCMDeviceService
 {
     Task<WispoFCMDevice[]> GetAllAsync(WispoFCMDevicesFilters filters);
-    Task<WispoFCMDevice> AddOrUpdateAsync(WispoAddOrUpdateFCMDeviceArgs args);
+    Task<WispoFCMDevice> AddOrUpdateAsync(FCMDeviceRawValue rawValue);
     Task<WispoFCMDevice[]> RemoveStaleAsync();
     Task RemoveRangeAsync(IEnumerable<WispoFCMDevice> devices);
+}
+
+public static class WispoFCMDevicesServiceExtensions
+{
+    public static async Task<ILookup<string, WispoFCMDevice>> GetMapByRecipientIdAsync(
+        this IWispoFCMDeviceService @this,
+        IEnumerable<string> recipientIds,
+        bool stale = false)
+    {
+        var filters = new WispoFCMDevicesFilters(recipientIds: recipientIds, stale: stale);
+
+        if (filters.RecipientIds == null || !filters.RecipientIds.Any())
+            return Array.Empty<(string, WispoFCMDevice)>().ToLookup(e => e.Item1, e => e.Item2);
+
+        var devices = await @this.GetAllAsync(filters);
+        return devices.ToLookup(e => e.RecipientId);
+    }
 }
 
 public class WispoFCMDevicesFilters
@@ -32,13 +49,13 @@ public class WispoFCMDevicesFilters
     }
 }
 
-public class WispoAddOrUpdateFCMDeviceArgs
+public class FCMDeviceRawValue
 {
     public string Token { get; init; }
     public string RecipientId { get; init; }
     public string? Meta { get; init; }
 
-    public WispoAddOrUpdateFCMDeviceArgs(string token, string recipientId, string? meta)
+    public FCMDeviceRawValue(string token, string recipientId, string? meta)
     {
         Token = token ?? throw new ArgumentNullException(nameof(token));
         RecipientId = recipientId ?? throw new ArgumentNullException(nameof(recipientId));
@@ -46,20 +63,20 @@ public class WispoAddOrUpdateFCMDeviceArgs
     }
 }
 
-internal class WispoFCMDevicesService : IWispoFCMDevicesService
+internal class WispoFCMDeviceService : IWispoFCMDeviceService
 {
-    private readonly IWispoFCMDevicesDbContext _dbContext;
+    private readonly IWispoFCMDeviceDbContext _dbContext;
     private readonly WispoFCMDevicesOptions _options;
 
-    private DbSet<WispoFCMDevice> DbSet => _dbContext.WispoFCMDevices;
+    private DbSet<WispoFCMDevice> DbSet => _dbContext.Devices;
 
     private Expression<Func<WispoFCMDevice, bool>> GetIsStaleAtPredicate(DateTimeOffset at) =>
-        e => e.UpdatedAt < at.Add(-_options.ConsiderStaleAfter);
+        e => e.UpdatedAt < at.Add(-_options.KeepUnusedFor);
 
     private Expression<Func<WispoFCMDevice, bool>> GetIsNotStaleAtPredicate(DateTimeOffset at) =>
-        e => e.UpdatedAt >= at.Add(-_options.ConsiderStaleAfter);
+        e => e.UpdatedAt >= at.Add(-_options.KeepUnusedFor);
 
-    public WispoFCMDevicesService(IWispoFCMDevicesDbContext dbContext, WispoFCMDevicesOptions options)
+    public WispoFCMDeviceService(IWispoFCMDeviceDbContext dbContext, WispoFCMDevicesOptions options)
     {
         _dbContext = dbContext;
         _options = options;
@@ -72,21 +89,21 @@ internal class WispoFCMDevicesService : IWispoFCMDevicesService
         return await queryable.ToArrayAsync();
     }
 
-    public async Task<WispoFCMDevice> AddOrUpdateAsync(WispoAddOrUpdateFCMDeviceArgs args)
+    public async Task<WispoFCMDevice> AddOrUpdateAsync(FCMDeviceRawValue rawValue)
     {
-        var device = await DbSet.FirstOrDefaultAsync(e => e.Token == args.Token);
+        var device = await DbSet.FirstOrDefaultAsync(e => e.Token == rawValue.Token);
 
         if (device != null)
         {
-            device.Update(args.RecipientId, args.Meta);
+            device.Update(rawValue.RecipientId, rawValue.Meta);
         }
         else
         {
             device = new WispoFCMDevice(
                 id: Guid.NewGuid(),
-                args.Token,
-                args.RecipientId,
-                args.Meta,
+                rawValue.Token,
+                rawValue.RecipientId,
+                rawValue.Meta,
                 updatedAt: DateTimeOffset.UtcNow,
                 createdAt: DateTimeOffset.UtcNow);
 
@@ -114,10 +131,10 @@ internal class WispoFCMDevicesService : IWispoFCMDevicesService
         IQueryable<WispoFCMDevice> queryable,
         WispoFCMDevicesFilters filters)
     {
-        if (filters.Ids?.Any() == true)
+        if (filters.Ids != null)
             queryable = queryable.Where(e => filters.Ids.Contains(e.Id));
 
-        if (filters.RecipientIds?.Any() == true)
+        if (filters.RecipientIds != null)
             queryable = queryable.Where(e => filters.RecipientIds.Contains(e.RecipientId));
 
         if (filters.Stale.HasValue)

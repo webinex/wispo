@@ -33,14 +33,14 @@ public static class WispoConfigurationExtensions
             .AppendFeedbackAdapter(typeof(WispoFCMFeedbackAdapter<>).MakeGenericType(configuration.DataType));
 
         services.TryAddSingleton(
-            typeof(IWispoFCMMessagesMapper<>).MakeGenericType(configuration.DataType),
-            typeof(DefaultWispoFCMMessagesMapper<>).MakeGenericType(configuration.DataType));
+            typeof(IWispoFCMMessageMapper<>).MakeGenericType(configuration.DataType),
+            typeof(DefaultWispoFCMMessageMapper<>).MakeGenericType(configuration.DataType));
 
-        services.TryAddScoped<IWispoFCMDevicesService, WispoFCMDevicesService>();
+        services.TryAddScoped<IWispoFCMDeviceService, WispoFCMDeviceService>();
 
         services.TryAddSingleton<IWispoFCMSender, WispoFCMSender>();
-        services.TryAddSingleton(new WispoFCMOptions { FCMJsonCredentialData = cfg.FCMJsonCredentialData, });
-        services.TryAddSingleton(new WispoFCMDevicesOptions { ConsiderStaleAfter = cfg.ConsiderStaleAfter, });
+        services.TryAddSingleton(new WispoFCMOptions { JsonCredentialData = cfg.JsonCredentialData, });
+        services.TryAddSingleton(new WispoFCMDevicesOptions { KeepUnusedFor = cfg.KeepUnusedFor, });
 
         return configuration;
     }
@@ -48,12 +48,12 @@ public static class WispoConfigurationExtensions
 
 internal class WispoFCMOptions
 {
-    public string FCMJsonCredentialData { get; init; } = null!;
+    public string JsonCredentialData { get; init; } = null!;
 }
 
 internal class WispoFCMDevicesOptions
 {
-    public TimeSpan ConsiderStaleAfter { get; init; }
+    public TimeSpan KeepUnusedFor { get; init; }
 }
 
 public interface IWispoFCMConfiguration
@@ -71,14 +71,14 @@ public interface IWispoFCMConfiguration
     /// <summary>
     /// Sets the period of inactivity after which devices will be considered stale. Must be positive and greater than 0.
     /// </summary>
-    IWispoFCMConfiguration UseDevicesStalePeriod(TimeSpan period);
+    IWispoFCMConfiguration UseDevicesStalePeriod(TimeSpan keepUnusedFor);
 
     /// <summary>
     /// Sets DbContext type to be used for storing FCM device tokens.
     /// </summary>
-    IWispoFCMConfiguration AddDevicesDbContext(Type dbContext);
+    IWispoFCMConfiguration UseDevicesDbContext(Type dbContext);
 
-    IWispoFCMConfiguration UseDictionaryWispoFCMMessagesMapper(
+    IWispoFCMConfiguration UseFCMMessageMapper(
         IReadOnlyDictionary<string, WispoFCMDictMappedMessage> dict,
         Func<string, WispoFCMDictMappedMessage> fallback);
 }
@@ -87,8 +87,8 @@ internal class WispoFCMConfiguration : IWispoFCMConfiguration
 {
     public IServiceCollection Services { get; }
     public Type DataType { get; }
-    public string? FCMJsonCredentialData { get; private set; }
-    public TimeSpan ConsiderStaleAfter { get; private set; } = TimeSpan.FromDays(30);
+    public string? JsonCredentialData { get; private set; }
+    public TimeSpan KeepUnusedFor { get; private set; } = TimeSpan.FromDays(30);
 
     public WispoFCMConfiguration(IWispoConfiguration configuration)
     {
@@ -96,49 +96,48 @@ internal class WispoFCMConfiguration : IWispoFCMConfiguration
         Services = configuration.Services;
     }
 
-    [MemberNotNull(nameof(FCMJsonCredentialData))]
-    public void Validate()
+    [MemberNotNull(nameof(JsonCredentialData))]
+    internal void Validate()
     {
-        if (FCMJsonCredentialData == null)
+        if (JsonCredentialData == null)
             throw new InvalidOperationException("FCMJsonCredentialData must be provided");
     }
 
 
     public IWispoFCMConfiguration UseFCMJsonCredentialData(string data)
     {
-        FCMJsonCredentialData = data ?? throw new ArgumentNullException(nameof(data));
+        JsonCredentialData = data ?? throw new ArgumentNullException(nameof(data));
         return this;
     }
 
-    public IWispoFCMConfiguration UseDevicesStalePeriod(TimeSpan period)
+    public IWispoFCMConfiguration UseDevicesStalePeriod(TimeSpan keepUnusedFor)
     {
-        if (period <= TimeSpan.Zero)
+        if (keepUnusedFor <= TimeSpan.Zero)
             throw new ArgumentException("Stale period must be positive and greater than 0");
 
-        ConsiderStaleAfter = period;
+        this.KeepUnusedFor = keepUnusedFor;
         return this;
     }
 
-    public IWispoFCMConfiguration AddDevicesDbContext(Type dbContext)
+    public IWispoFCMConfiguration UseDevicesDbContext(Type dbContext)
     {
-        if (!dbContext.IsAssignableTo(typeof(IWispoFCMDevicesDbContext)))
-            throw new ArgumentException($"dbContext must implements {nameof(IWispoFCMDevicesDbContext)}");
+        if (!dbContext.IsAssignableTo(typeof(IWispoFCMDeviceDbContext)))
+            throw new ArgumentException($"dbContext must implements {nameof(IWispoFCMDeviceDbContext)}");
 
-        Services.TryAddScoped(typeof(IWispoFCMDevicesDbContext), dbContext);
+        Services.TryAddScoped(typeof(IWispoFCMDeviceDbContext), dbContext);
         return this;
     }
 
-    public IWispoFCMConfiguration UseDictionaryWispoFCMMessagesMapper(
+    public IWispoFCMConfiguration UseFCMMessageMapper(
         IReadOnlyDictionary<string, WispoFCMDictMappedMessage> dict,
         Func<string, WispoFCMDictMappedMessage> fallback)
     {
-        var serviceType = typeof(IWispoFCMMessagesMapper<>).MakeGenericType(DataType);
-        var implementationType = typeof(DictionaryWispoFCMMessagesMapper<>).MakeGenericType(DataType);
-        
-        Services.TryAddSingleton(
-            serviceType,
-            _ => Activator.CreateInstance(implementationType, dict, fallback) ??
-                   throw new InvalidOperationException());
+        var serviceType = typeof(IWispoFCMMessageMapper<>).MakeGenericType(DataType);
+        var implementationType = typeof(DictionaryWispoFCMMessageMapper<>).MakeGenericType(DataType);
+
+        var implementation = Activator.CreateInstance(implementationType, dict, fallback) ??
+                       throw new InvalidOperationException();
+        Services.TryAddSingleton(serviceType, _ => implementation);
 
         return this;
     }
