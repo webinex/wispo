@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken } from 'firebase/messaging';
+import { getMessaging, getToken, deleteToken } from 'firebase/messaging';
 import { WispoFCMGetConfigResponse, WispoFCMHttpClient } from './wispoFCMHttpClient';
 import { WISPO_FCM_MESSAGE_CONFIG_TYPE } from './constants';
 
@@ -10,6 +10,11 @@ interface RegisterAndConnectWispoFCMDeviceOptions {
   extraDetails?: object;
 }
 
+/**
+ * Register device and connect it to wispo fcm
+ * @param options
+ * @returns unregister callback
+ */
 export const registerAndConnectWispoFCMDevice = async ({
   wispoClient,
   sw,
@@ -33,6 +38,10 @@ export const registerAndConnectWispoFCMDevice = async ({
     deviceType: deviceType ?? 'web',
     extra: extraDetails,
   });
+
+  return async () => {
+    await deleteToken(messaging);
+  };
 };
 
 const connectWispoFCMWithSw = (sw: ServiceWorkerRegistration, config: WispoFCMGetConfigResponse) => {

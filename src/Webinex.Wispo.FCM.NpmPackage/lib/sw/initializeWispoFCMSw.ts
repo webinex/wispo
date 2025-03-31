@@ -6,8 +6,12 @@ let firebaseUnsubscribe: Unsubscribe | null = null;
 
 export const initializeWispoFCMSw = () => {
   self.addEventListener('message', (event) => {
-    if (!!event.data && event.data.type === WISPO_FCM_MESSAGE_CONFIG_TYPE) {
-      subscribeToFCMMessages(event.data.payload);
+    if (event.data == null) return;
+
+    switch (event.data.type) {
+      case WISPO_FCM_MESSAGE_CONFIG_TYPE:
+        subscribeToFCMMessages(event.data.payload);
+        break;
     }
   });
 };
