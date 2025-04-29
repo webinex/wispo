@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Threading;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Webinex.Wispo.FCM.Devices;
 
 namespace Webinex.Wispo.FCM.AspNetCore;
 
@@ -19,14 +17,9 @@ public static class WispoFCMRouteBuilderExtensions
                 route,
                 async (
                     [FromBody] WispoFCMRegisterDeviceDto dto,
-                    [FromServices] IWispoFCMDeviceService devicesService,
-                    [FromServices] IWispoFCMDeviceDtoMapper dtoMapper,
-                    [FromServices] IWispoFCMDeviceDbContext dbContext) =>
+                    [FromServices] IWispoFCMDevicesApi devicesApi) =>
                 {
-                    var args = await dtoMapper.MapAsync(dto);
-                    await devicesService.AddOrUpdateAsync(args);
-                    await dbContext.SaveChangesAsync(CancellationToken.None);
-
+                    await devicesApi.RegisterDevice(dto);
                     return Results.Ok();
                 })
             .WithTags("WispoFCMDevices")
@@ -45,7 +38,7 @@ public static class WispoFCMRouteBuilderExtensions
     {
         var getWebConfig = endpoints.MapGet(
                 route,
-                ([FromServices] WispoFCMWebSettings options) => Results.Ok(options))
+                async ([FromServices] IWispoFCMWebConfigApi api) => Results.Ok(await api.GetConfig()))
             .WithTags("WispoFCMWeb")
             .WithName("GetConfig")
             .WithOpenApi();

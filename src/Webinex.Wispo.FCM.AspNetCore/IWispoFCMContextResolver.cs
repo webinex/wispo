@@ -5,33 +5,33 @@ using Microsoft.AspNetCore.Http;
 
 namespace Webinex.Wispo.FCM.AspNetCore;
 
-internal interface IWispoFCMContext
+public interface IWispoFCMContextResolver
 {
-    Task<WispoFCMContextData> Resolve();
+    Task<WispoFCMContext> Resolve();
 }
 
-public class WispoFCMContextData
+public class WispoFCMContext
 {
     public required string RecipientId { get; init; }
 }
 
-internal class HttpContextWispoFCMContext : IWispoFCMContext
+internal class HttpContextResolverWispoFCMContextResolver : IWispoFCMContextResolver
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public HttpContextWispoFCMContext(IHttpContextAccessor httpContextAccessor)
+    public HttpContextResolverWispoFCMContextResolver(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public Task<WispoFCMContextData> Resolve()
+    public Task<WispoFCMContext> Resolve()
     {
         var recipientId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (recipientId == null)
             throw new InvalidOperationException($"RecipientId was not resolved from the HttpContext.");
 
-        return Task.FromResult(new WispoFCMContextData
+        return Task.FromResult(new WispoFCMContext
         {
             RecipientId = recipientId,
         });

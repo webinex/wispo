@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Webinex.Wispo.FCM.AspNetCore;
@@ -11,7 +10,8 @@ public static class WispoFCMConfigurationExtensions
     /// </summary>
     public static IWispoFCMConfiguration AddDeviceApiCore(this IWispoFCMConfiguration @this)
     {
-        @this.Services.TryAddSingleton<IWispoFCMContext, HttpContextWispoFCMContext>();
+        @this.Services.TryAddScoped<IWispoFCMDevicesApi, WispoFCMDevicesApi>();
+        @this.Services.TryAddSingleton<IWispoFCMContextResolver, HttpContextResolverWispoFCMContextResolver>();
         @this.Services.TryAddSingleton<IWispoFCMDeviceDtoMapper, DefaultWispoFCMDeviceDtoMapper>();
 
         return @this;
@@ -24,24 +24,8 @@ public static class WispoFCMConfigurationExtensions
         this IWispoFCMConfiguration @this,
         WispoFCMWebSettings settings)
     {
-        settings.Validate();
-
         @this.Services.TryAddSingleton(settings);
-
-        return @this;
-    }
-
-    /// <summary>
-    /// Adds a job that cleans up the database from staled devices. By default runs every 12 hours.
-    /// </summary>
-    public static IWispoFCMConfiguration AddStaleDevicesCleaningJob(
-        this IWispoFCMConfiguration @this,
-        TimeSpan? cleaningInterval = null)
-    {
-        cleaningInterval ??= TimeSpan.FromHours(12);
-        @this.Services
-            .AddSingleton(new WispoFCMStaleDevicesCleaningJobOptions(cleaningInterval.Value))
-            .AddHostedService<WispoFCMStaleDevicesCleaningJob>();
+        @this.Services.TryAddSingleton<IWispoFCMWebConfigApi, WispoFCMWebConfigApi>();
 
         return @this;
     }
@@ -58,7 +42,15 @@ public class WispoFCMWebSettings
     public required string VapidKey { get; init; }
     public string? MeasurementId { get; init; }
 
-    internal void Validate()
+    public WispoFCMWebSettings(
+        string apiKey,
+        string authDomain,
+        string projectId,
+        string storageBucket,
+        string messagingSenderId, 
+        string appId,
+        string vapidKey,
+        string? measurementId)
     {
         if (string.IsNullOrWhiteSpace(ApiKey))
             throw new ArgumentException("ApiKey is required");
@@ -74,5 +66,14 @@ public class WispoFCMWebSettings
             throw new ArgumentException("AppId is required");
         if (string.IsNullOrWhiteSpace(VapidKey))
             throw new ArgumentException("VapidKey is required");
+        
+        ApiKey = apiKey;
+        AuthDomain = authDomain;
+        ProjectId = projectId;
+        StorageBucket = storageBucket;
+        MessagingSenderId = messagingSenderId;
+        AppId = appId;
+        VapidKey = vapidKey;
+        MeasurementId = measurementId;
     }
 }

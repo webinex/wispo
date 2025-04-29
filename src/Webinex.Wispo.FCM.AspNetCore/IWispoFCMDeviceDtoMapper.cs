@@ -13,16 +13,16 @@ public interface IWispoFCMDeviceDtoMapper
 
 internal class DefaultWispoFCMDeviceDtoMapper : IWispoFCMDeviceDtoMapper
 {
-    private readonly IWispoFCMContext _context;
+    private readonly IWispoFCMContextResolver _contextResolver;
 
-    public DefaultWispoFCMDeviceDtoMapper(IWispoFCMContext context)
+    public DefaultWispoFCMDeviceDtoMapper(IWispoFCMContextResolver contextResolver)
     {
-        _context = context;
+        _contextResolver = contextResolver;
     }
 
     public async Task<FCMDeviceRawValue> MapAsync(WispoFCMRegisterDeviceDto dto)
     {
-        var context = await _context.Resolve();
+        var context = await _contextResolver.Resolve();
 
         return new FCMDeviceRawValue(dto.Token, context.RecipientId, GetMeta(dto));
     }
@@ -31,7 +31,7 @@ internal class DefaultWispoFCMDeviceDtoMapper : IWispoFCMDeviceDtoMapper
     {
         var meta = JsonSerializer.SerializeToElement(new
         {
-            DeviceType = dto.DeviceType ?? throw new ArgumentNullException()
+            DeviceType = dto.DeviceType,
         });
         var metaObject = JsonObject.Create(meta) ?? throw new InvalidOperationException();
 

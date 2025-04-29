@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
 
@@ -16,8 +15,8 @@ public class WispoFCMRegisterDeviceDto
 
     public WispoFCMRegisterDeviceDto(string token, string deviceType, JsonObject? extra)
     {
-        Token = token ?? throw new ArgumentNullException(nameof(token));
-        DeviceType = deviceType ?? throw new ArgumentNullException(nameof(deviceType));
+        Token = token;
+        DeviceType = deviceType;
         Extra = extra;
     }
 }

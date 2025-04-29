@@ -1,19 +1,21 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Webinex.Wispo.FCM.Devices;
 
-internal class WispoFCMStaleDevicesCleaningJobOptions
+namespace Webinex.Wispo.FCM;
+
+public class WispoFCMStaleDevicesCleaningJobOptions
 {
     public TimeSpan CleaningInterval { get; }
 
-    public WispoFCMStaleDevicesCleaningJobOptions(TimeSpan cleaningInterval)
+    public WispoFCMStaleDevicesCleaningJobOptions(TimeSpan? cleaningInterval = null)
     {
-        CleaningInterval = cleaningInterval;
+        CleaningInterval = cleaningInterval ?? TimeSpan.FromHours(12);
     }
 }
 
@@ -39,7 +41,7 @@ internal class WispoFCMStaleDevicesCleaningJob : BackgroundService
         _logger.LogInformation("Stale devices cleaning job is started");
 
         await DoWorkAsync(stoppingToken);
-        
+
         while (await _timer.WaitForNextTickAsync(stoppingToken) && !stoppingToken.IsCancellationRequested)
         {
             await DoWorkAsync(stoppingToken);
