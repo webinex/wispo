@@ -1,7 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
-using Webinex.Wispo.Ports;
 
 namespace Webinex.Wispo.SignalR;
 
@@ -19,9 +17,10 @@ public static class WispoConfigurationExtensions
         where THub : Hub
     {
         configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        configuration.Services.AddScoped(
-            typeof(IWispoFeedbackPort<>).MakeGenericType(configuration.DataType),
+
+        configuration.AppendFeedbackAdapter(
             typeof(SignalRHubWispoFeedbackAdapter<,>).MakeGenericType(configuration.DataType, typeof(THub)));
+
         return configuration;
     }
 }

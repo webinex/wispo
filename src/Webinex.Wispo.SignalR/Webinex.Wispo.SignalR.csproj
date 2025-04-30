@@ -2,9 +2,8 @@
   <Import Project="$(MSBuildThisFileDirectory)/../Webinex.Wispo.All/Package.props"/>
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <PackageId>Webinex.Wispo.SignalR</PackageId>
-    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
