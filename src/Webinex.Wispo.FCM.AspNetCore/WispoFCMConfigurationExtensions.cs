@@ -33,13 +33,13 @@ public static class WispoFCMConfigurationExtensions
 
 public class WispoFCMWebSettings
 {
-    public required string ApiKey { get; init; }
-    public required string AuthDomain { get; init; }
-    public required string ProjectId { get; init; }
-    public required string StorageBucket { get; init; }
-    public required string MessagingSenderId { get; init; }
-    public required string AppId { get; init; }
-    public required string VapidKey { get; init; }
+    public string ApiKey { get; init; }
+    public string AuthDomain { get; init; }
+    public string ProjectId { get; init; }
+    public string StorageBucket { get; init; }
+    public string MessagingSenderId { get; init; }
+    public string AppId { get; init; }
+    public string VapidKey { get; init; }
     public string? MeasurementId { get; init; }
 
     public WispoFCMWebSettings(

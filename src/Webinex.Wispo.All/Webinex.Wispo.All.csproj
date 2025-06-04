@@ -10,6 +10,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Webinex.Wispo.Abstractions\Webinex.Wispo.Abstractions.csproj"/>
     <ProjectReference Include="..\Webinex.Wispo.AspNetCore\Webinex.Wispo.AspNetCore.csproj"/>
+    <ProjectReference Include="..\Webinex.Wispo.FCM.AspNetCore\Webinex.Wispo.FCM.AspNetCore.csproj" />
+    <ProjectReference Include="..\Webinex.Wispo.FCM\Webinex.Wispo.FCM.csproj" />
     <ProjectReference Include="..\Webinex.Wispo\Webinex.Wispo.csproj"/>
     <ProjectReference Include="..\Webinex.Wispo.SignalR\Webinex.Wispo.SignalR.csproj"/>
   </ItemGroup>

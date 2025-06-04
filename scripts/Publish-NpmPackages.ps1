@@ -8,7 +8,8 @@ $ErrorActionPreference = "Stop"
 $slnRoot = [IO.Path]::Combine($PSScriptRoot, '..', 'src') | Resolve-Path
 
 $packages = @(
-  "Webinex.Wispo.NpmPackage"
+  "Webinex.Wispo.NpmPackage",
+  "Webinex.Wispo.FCM.NpmPackage"
 )
 
 function Get-PackageInfo([Parameter(Mandatory = $true)] [string] $Name) {

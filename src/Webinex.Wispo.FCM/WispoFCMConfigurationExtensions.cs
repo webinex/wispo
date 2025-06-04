@@ -19,9 +19,9 @@ public static class WispoFCMConfigurationExtensions
     /// </summary>
     public static IWispoFCMConfiguration AddStaleDevicesCleaningJob(
         this IWispoFCMConfiguration @this,
-        WispoFCMStaleDevicesCleaningJobOptions options)
+        WispoFCMStaleDevicesCleaningJobOptions? options = null)
     {
-        @this.Services.TryAddSingleton(options);
+        @this.Services.TryAddSingleton(options ?? new WispoFCMStaleDevicesCleaningJobOptions());
         @this.Services.AddHostedService<WispoFCMStaleDevicesCleaningJob>();
 
         return @this;
