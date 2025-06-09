@@ -52,20 +52,20 @@ public class WispoFCMWebSettings
         string vapidKey,
         string? measurementId)
     {
-        if (string.IsNullOrWhiteSpace(ApiKey))
-            throw new ArgumentException("ApiKey is required");
-        if (string.IsNullOrWhiteSpace(AuthDomain))
-            throw new ArgumentException("AuthDomain is required");
-        if (string.IsNullOrWhiteSpace(ProjectId))
-            throw new ArgumentException("ProjectId is required");
-        if (string.IsNullOrWhiteSpace(StorageBucket))
-            throw new ArgumentException("StorageBucket is required");
-        if (string.IsNullOrWhiteSpace(MessagingSenderId))
-            throw new ArgumentException("MessagingSenderId is required");
-        if (string.IsNullOrWhiteSpace(AppId))
-            throw new ArgumentException("AppId is required");
-        if (string.IsNullOrWhiteSpace(VapidKey))
-            throw new ArgumentException("VapidKey is required");
+        if (string.IsNullOrWhiteSpace(apiKey))
+            throw new ArgumentException("apiKey is required");
+        if (string.IsNullOrWhiteSpace(authDomain))
+            throw new ArgumentException("authDomain is required");
+        if (string.IsNullOrWhiteSpace(projectId))
+            throw new ArgumentException("projectId is required");
+        if (string.IsNullOrWhiteSpace(storageBucket))
+            throw new ArgumentException("storageBucket is required");
+        if (string.IsNullOrWhiteSpace(messagingSenderId))
+            throw new ArgumentException("messagingSenderId is required");
+        if (string.IsNullOrWhiteSpace(appId))
+            throw new ArgumentException("appId is required");
+        if (string.IsNullOrWhiteSpace(vapidKey))
+            throw new ArgumentException("vapidKey is required");
         
         ApiKey = apiKey;
         AuthDomain = authDomain;
