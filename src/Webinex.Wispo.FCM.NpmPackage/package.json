@@ -20,7 +20,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "yarn run build"
   },
   "peerDependencies": {
     "axios": ">=0.24",
